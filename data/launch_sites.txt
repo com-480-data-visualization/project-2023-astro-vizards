@@ -1,22 +1,18 @@
-Vandenberg AFB,34.77204°N, 120.60124°W
-Cape Canaveral
-Guiana Space Center
-Baikonur Cosmodrome
-Wallops Island Flight Facility
-Satish Dhawan Space Centre
-Sea Launch (Odyssey)
-Svobodny Cosmodrome
-Kodiak Launch Complex
-Satish Dhawan Space Center
-Plesetsk Cosmodrome
-Sea Launch
-Taiyuan Launch Center
-Xichang Satellite Launch Center
-Jiuquan Satellite Launch Center
-Dombarovsky Air Base
-Uchinoura Space Center
-Tanegashima Space Center
-Kwajalein Island
-Vostochny Cosmodrome
-Satish Dhawan Space Center 
-Satish Dhawan
+Name, LAT, LONG
+Vandenberg AFB, 34.77204, -120.60124
+Cape Canaveral, 28.46675, -80.55852
+Guiana Space Center, 5.23739, -52.7695
+Baikonur Cosmodrome, 45.95515, 63.35028
+Wallops Island Flight Facility, 37.84621, -75.47938
+Satish Dhawan Space Centre, 13.7374, 80.2351
+Svobodny Cosmodrome, 51.83441, 128.2757
+Kodiak Launch Complex, 57.43533, -152.33931
+Plesetsk Cosmodrome, 62.925556, 40.577778
+Taiyuan Launch Center, 38.849086, 111.608497
+Xichang Satellite Launch Center, 28.24646, 102.02814
+Jiuquan Satellite Launch Center, 40.96056, 100.29833
+Dombarovsky Air Base, 51.20706, 59.85003
+Uchinoura Space Center, 31.25186, 131.07914
+Tanegashima Space Center, 30.39096, 130.96813
+Kwajalein Island, 9.048167, 167.743083
+Vostochny Cosmodrome, 51.883, 128.333
