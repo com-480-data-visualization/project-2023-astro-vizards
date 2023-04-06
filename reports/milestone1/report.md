@@ -48,6 +48,8 @@ Understanding the usage of satellites also provides a nice overview of occupancy
 
 ![](images/launches.png)
 
+This figure shows the number of satellites launched in each year between 1974-2016. The launch year has been extracted from the "Date of Launch" column of the dataset. By using this feature, it is possible to view satellites that have been launched in specific ranges of dates.
+
 ## Related work
 
 Some of the current work available on this can be found below:	
