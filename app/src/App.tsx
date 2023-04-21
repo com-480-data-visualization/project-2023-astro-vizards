@@ -11,7 +11,7 @@ import {
   clearAllPoints,
   drawMultiplePoints,
   initMap,
-  initSatelittes,
+  Satellite,
 } from "./utilities";
 import { SatelliteType } from "./types";
 
@@ -22,9 +22,15 @@ function Home() {
   }, []);
 
   const view = useMemo(() => initMap(), []);
+
   const [satellites, setSatellites] = useState<SatelliteType[]>(
-    initSatelittes()
+    Satellite.getInitialSetOfSats()
   );
+
+  const satelliteManager = useMemo(() => {
+    const satMan = new Satellite(setSatellites);
+    return satMan;
+  }, []);
 
   useEffect(() => {
     clearAllPoints(view);
@@ -35,7 +41,7 @@ function Home() {
     <Layout className="app">
       <Header />
       <Layout>
-        <Sidebar satellites={satellites} setSatellites={setSatellites} />
+        <Sidebar satalliteManager={satelliteManager} />
         <Layout className="app__content">
           <Routes>
             <Route path="/" element={<MapPage view={view} />} />

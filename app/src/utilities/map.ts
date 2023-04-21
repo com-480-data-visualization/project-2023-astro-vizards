@@ -26,6 +26,24 @@ const simpleMarkerSymbolDark = {
   },
 };
 
+const getTextSymbol = (x: number) => {
+  return {
+    type: "text", // autocasts as new TextSymbol()
+    color: "white",
+    haloColor: "black",
+    haloSize: "1px",
+    text: "Satellite" + x,
+    xoffset: 3,
+    yoffset: 3,
+    font: {
+      // autocasts as new Font()
+      size: 12,
+      family: "Roboto",
+      weight: "bold",
+    },
+  };
+};
+
 let current_points: Record<number, Graphic>;
 
 const initMap = () => {
@@ -68,7 +86,7 @@ const drawPoint = (view: MapView, satellite: SatelliteType) => {
     latitude: satellite.latitude,
   });
   const g = new Graphic({
-    symbol: simpleMarkerSymbolDark,
+    symbol: getTextSymbol(satellite.id),
     geometry: p,
   });
   view.graphics.add(g);

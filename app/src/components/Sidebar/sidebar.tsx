@@ -8,14 +8,13 @@ import {
 } from "@ant-design/icons";
 import React, { useState } from "react";
 import { SatelliteType } from "../../types";
-import { sideBarRemoveFilter, sideBarSatClick } from "../../utilities";
+import { Satellite } from "../../utilities";
 
 interface SidebarProps {
-  satellites: SatelliteType[];
-  setSatellites: React.Dispatch<React.SetStateAction<SatelliteType[]>>;
+  satalliteManager: Satellite;
 }
 
-export function Sidebar({ satellites, setSatellites }: SidebarProps) {
+export function Sidebar({ satalliteManager }: SidebarProps) {
   const [filtered, setFiltered] = useState(false);
 
   const {
@@ -30,17 +29,19 @@ export function Sidebar({ satellites, setSatellites }: SidebarProps) {
     const key = String(index + 1);
 
     if (key === "1") {
-      let subMenuChildren: any[] = satellites.map((sat, j) => {
-        return {
-          key: "Sat-" + sat.id,
-          label: `Satellite ${sat.id}`,
-          icon: undefined,
-          onClick: () => {
-            sideBarSatClick(sat, setSatellites);
-            setFiltered(true);
-          },
-        };
-      });
+      let subMenuChildren: any[] = satalliteManager
+        .getSatellites()
+        .map((sat, j) => {
+          return {
+            key: "Sat-" + sat.id,
+            label: `Satellite ${sat.id}`,
+            icon: undefined,
+            onClick: () => {
+              satalliteManager.chooseSat(sat);
+              setFiltered(true);
+            },
+          };
+        });
       if (filtered) {
         subMenuChildren = subMenuChildren.concat([
           {
@@ -48,7 +49,7 @@ export function Sidebar({ satellites, setSatellites }: SidebarProps) {
             label: "Remove Filter",
             icon: React.createElement(CloseCircleOutlined),
             onClick: () => {
-              sideBarRemoveFilter(setSatellites);
+              satalliteManager.removeFilter();
               setFiltered(false);
             },
           },

@@ -4,44 +4,48 @@ function randomInt(max: number) {
   return Math.ceil(Math.random() * max) * (Math.round(Math.random()) ? 1 : -1);
 }
 
-const initSatelittes = (): SatelliteType[] => {
-  /** PLACEHOLDER TODO: CHANGE WITH ACTUAL DATA FETCHING AND RETURN ALL THE SATS **/
+class Satellite {
+  private setSattelites: React.Dispatch<React.SetStateAction<SatelliteType[]>>;
+  private allSattelites: SatelliteType[];
 
-  return [
-    {
-      id: 5,
-      longtitude: randomInt(180),
-      latitude: randomInt(90),
-    },
-    {
-      id: 8,
-      longtitude: randomInt(180),
-      latitude: randomInt(90),
-    },
-    {
-      id: 10,
-      longtitude: randomInt(180),
-      latitude: randomInt(90),
-    },
-    {
-      id: 13,
-      longtitude: randomInt(180),
-      latitude: randomInt(90),
-    },
-  ];
-};
+  static genRandomSats = (count: number) => {
+    const sats: SatelliteType[] = [];
 
-const sideBarSatClick = (
-  satellite: SatelliteType,
-  setSatellites: React.Dispatch<React.SetStateAction<SatelliteType[]>>
-) => {
-  setSatellites([satellite]);
-};
+    for (let i = 0; i < count; i++) {
+      sats.push({
+        id: i,
+        longtitude: randomInt(100),
+        latitude: randomInt(50),
+      });
+    }
+    return sats;
+  };
 
-const sideBarRemoveFilter = (
-  setSatellites: React.Dispatch<React.SetStateAction<SatelliteType[]>>
-) => {
-  setSatellites(initSatelittes());
-};
+  static getInitialSetOfSats(): SatelliteType[] {
+    // Used by the App.tsx to fetch the very first state of set of Satellites
+    /** PLACEHOLDER TODO: CHANGE WITH ACTUAL DATA FETCHING AND RETURN ALL THE SATS **/
+    return Satellite.genRandomSats(4);
+  }
 
-export { initSatelittes, sideBarSatClick, sideBarRemoveFilter };
+  constructor(setSats: React.Dispatch<React.SetStateAction<SatelliteType[]>>) {
+    this.allSattelites = Satellite.getInitialSetOfSats();
+    this.setSattelites = setSats;
+  }
+
+  public getSatellites(): SatelliteType[] {
+    return this.allSattelites;
+  }
+
+  public chooseSat = (sattelite: SatelliteType) => {
+    this.allSattelites = [sattelite];
+    console.log("All sats are now: ", this.allSattelites);
+    this.setSattelites([sattelite]);
+  };
+
+  public removeFilter = () => {
+    this.allSattelites = Satellite.getInitialSetOfSats();
+    this.setSattelites(this.allSattelites);
+  };
+}
+
+export { Satellite };
