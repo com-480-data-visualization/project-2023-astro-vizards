@@ -66,14 +66,24 @@ class Satellite {
     console.log("Period " + period);
   
     // Compute sampling points
-    const N = 10;
-    const initial = moment(this.date).subtract(halfPeriod, 'h');
-    const end = moment(this.date).add(halfPeriod, 'h');
-    const step = moment.duration(end.diff(initial)).asHours() / N;
+    // const N = 30;
+    // const FACTOR = 0.925;
+    // const initial = moment(this.date).subtract(halfPeriod * FACTOR, 'h');
+    // const end = moment(this.date).add(halfPeriod * FACTOR, 'h');
+    // const step = moment.duration(end.diff(initial)).asHours() / N;
 
-    const points = [];
-    for (let i=0; i<N+1; i++) {
-      const current_date = moment(initial).add(step * i, 'h').toDate();
+    // Algorithm start from the current satellite position and try to find points
+    // until reaching the border of the map (-180, 180) in the latitude.
+    // Not perfect, but should fix the issue with the lines
+    var i = 0;
+    var sign = -1;
+    var points_final: any = [];
+    var points: any = [];
+    const MAX_N = 100;
+    const initial = moment(this.date);
+    while (true) {
+      const step = period * 0.01;
+      const current_date = moment(initial).add(step * i * sign, 'h').toDate();
 
       const positionAndVelocity = propagate(satrec, current_date);
       const positionEci = positionAndVelocity.position as EciVec3<number>;
@@ -81,10 +91,52 @@ class Satellite {
       const positionGd = eciToGeodetic(positionEci as EciVec3<number>, gmst);
       const longitudeDeg = degreesLong(positionGd.longitude);
       const latitudeDeg = degreesLat(positionGd.latitude);
-      points.push([longitudeDeg, latitudeDeg]);
+
+      if (i === 0) {
+        points.push([longitudeDeg, latitudeDeg]);
+        console.dir([longitudeDeg, latitudeDeg]);
+        i += 1;
+        continue
+      }
+
+      if (i >= MAX_N) {
+        points_final = points;
+        break;
+      }
+
+      if (Math.sign(longitudeDeg) !== Math.sign(points[i-1][0]) && Math.abs(longitudeDeg) > 100) {
+        if (sign === -1) {
+          points_final = points.reverse();
+          console.dir(points_final);
+          i = 0;
+          sign = 1;
+          points = [];
+        } else {
+          console.log("Points right");
+          console.dir(points);
+          points_final = points_final.concat(points.slice(1));
+          break;
+        }
+      } else {
+        points.push([longitudeDeg, latitudeDeg]);
+        i += 1;
+      }
     }
-    console.dir(points);
-    return points;
+
+    // for (let i=0; i<N+1; i++) {
+    //   const current_date = moment(initial).add(step * i, 'h').toDate();
+
+    //   const positionAndVelocity = propagate(satrec, current_date);
+    //   const positionEci = positionAndVelocity.position as EciVec3<number>;
+    //   var gmst = gstime(current_date);
+    //   const positionGd = eciToGeodetic(positionEci as EciVec3<number>, gmst);
+    //   const longitudeDeg = degreesLong(positionGd.longitude);
+    //   const latitudeDeg = degreesLat(positionGd.latitude);
+    //   points.push([longitudeDeg, latitudeDeg]);
+    // }
+
+    console.dir(points_final);
+    return points_final;
   }
 
   public filter = (filters: FilterType) => {
