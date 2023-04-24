@@ -1,51 +1,195 @@
-import { SatelliteType } from "../types";
+import { FilterType, SatelliteMetadata, SatelliteType } from "../types";
+import {
+  degreesLat,
+  degreesLong,
+  eciToGeodetic,
+  EciVec3,
+  gstime,
+  propagate,
+  twoline2satrec,
+} from "satellite.js";
+import { useState } from "react";
+import 'moment';
+import moment from "moment";
 
-function randomInt(max: number) {
-  return Math.ceil(Math.random() * max) * (Math.round(Math.random()) ? 1 : -1);
-}
+// function randomInt(max: number) {
+//   return Math.ceil(Math.random() * max) * (Math.round(Math.random()) ? 1 : -1);
+// }
 
 class Satellite {
-  private setSattelites: React.Dispatch<React.SetStateAction<SatelliteType[]>>;
+  private setSatellites: React.Dispatch<React.SetStateAction<SatelliteType[]>>;
+  private setMetadata: React.Dispatch<React.SetStateAction<SatelliteMetadata>>;
   private allSattelites: SatelliteType[];
+  private satelliteData: any[];
+  private metadata: SatelliteMetadata;
+  private date: Date;
 
-  static genRandomSats = (count: number) => {
+  constructor(
+    setSats: React.Dispatch<React.SetStateAction<SatelliteType[]>>,
+    setMetadata: React.Dispatch<React.SetStateAction<SatelliteMetadata>>,
+  ) {
+    this.setSatellites = setSats;
+    this.setMetadata = setMetadata;
+    this.allSattelites = [];
+    this.satelliteData = [];
+    this.metadata = Satellite.getEmptyMetadata();
+    this.date = new Date();
+
+    this.initSatellites();
+  }
+
+  public getSatellites = () => {
+    return this.allSattelites.filter((sat) => sat.selected);
+  }
+
+  public getInfo = (id: number) => {
+    return (id >= 0) ? this.satelliteData[id] : null;
+  }
+
+  public setDate = (date: Date) => {
+    this.date = date;
+  }
+
+  public getOrbit = (id: number) => {
+    // Compute period of orbit
+    const satrec = twoline2satrec(
+      this.satelliteData[id]["LINE1"],
+      this.satelliteData[id]["LINE2"],
+    );
+
+    const line2 = this.satelliteData[id]["LINE2"] as string;
+    const mo = line2.substring(52, 62);
+    const period = 1.0 / parseFloat(mo) * 24;
+    
+    const halfPeriod = period / 2.0;
+    
+    console.log("Period " + period);
+  
+    // Compute sampling points
+    const N = 10;
+    const initial = moment(this.date).subtract(halfPeriod, 'h');
+    const end = moment(this.date).add(halfPeriod, 'h');
+    const step = moment.duration(end.diff(initial)).asHours() / N;
+
+    const points = [];
+    for (let i=0; i<N+1; i++) {
+      const current_date = moment(initial).add(step * i, 'h').toDate();
+
+      const positionAndVelocity = propagate(satrec, current_date);
+      const positionEci = positionAndVelocity.position as EciVec3<number>;
+      var gmst = gstime(current_date);
+      const positionGd = eciToGeodetic(positionEci as EciVec3<number>, gmst);
+      const longitudeDeg = degreesLong(positionGd.longitude);
+      const latitudeDeg = degreesLat(positionGd.latitude);
+      points.push([longitudeDeg, latitudeDeg]);
+    }
+    console.dir(points);
+    return points;
+  }
+
+  public filter = (filters: FilterType) => {
+    const entries = Object.entries(filters);
+    for (let i = 0; i < this.allSattelites.length; i++) {
+      const sat = this.allSattelites[i] as any;
+      const sat_data = this.satelliteData[i] as any;
+      if (entries.length === 0) {
+        sat.selected = true;
+        continue;
+      }
+
+      var selected = true;
+      for (let j = 0; j < entries.length; j++) {
+        const filter_key = entries[j][0];
+        const filter_val = entries[j][1];
+        const isValid = (filter_key === 'id') 
+          ? filter_val.includes(sat[filter_key])
+          : filter_val.includes(sat_data[filter_key])
+        selected = selected && isValid;
+      }
+
+      sat.selected = selected;
+    }
+
+    this.setSatellites(this.getSatellites());
+  };
+
+  private updateLocation = () => {
+    // Process data
+    const sats_data = this.satelliteData;
     const sats: SatelliteType[] = [];
+    var gmst = gstime(this.date);
+    for (let i = 0; i < sats_data.length; i++) {
+      // Compute information of the satellites given the current time
+      const satrec = twoline2satrec(
+        sats_data[i]["LINE1"],
+        sats_data[i]["LINE2"],
+      );
+      const positionAndVelocity = propagate(satrec, this.date);
+      const positionEci = positionAndVelocity.position;
 
-    for (let i = 0; i < count; i++) {
+      const positionGd = eciToGeodetic(positionEci as EciVec3<number>, gmst);
+      const longitudeDeg = degreesLong(positionGd.longitude);
+      const latitudeDeg = degreesLat(positionGd.latitude);
+
       sats.push({
         id: i,
-        longtitude: randomInt(100),
-        latitude: randomInt(50),
+        name: sats_data[i]["Official Name of Satellite"],
+        longitude: longitudeDeg,
+        latitude: latitudeDeg,
+        selected: true,
       });
+
+      const sat = sats_data[i];
+      // Save metadata
+      const addUnique = (field: string, val: string) => {
+        if (!(this.metadata as any)[field].includes(val)) {
+          (this.metadata as any)[field].push(val);
+        }
+      };
+      addUnique("Country/Organization of UN Registry", sat["Country/Organization of UN Registry"]);
+      addUnique("Operator/Owner", sat["Operator/Owner"]);
+      addUnique("Users", sat["Users"]);
+      addUnique("Purpose", sat["Purpose"]);
+      addUnique("Contractor", sat["Contractor"]);
     }
-    return sats;
+
+    this.allSattelites = sats;
+    this.setMetadata(this.metadata);
+    this.setSatellites(sats);
   };
 
-  static getInitialSetOfSats(): SatelliteType[] {
-    // Used by the App.tsx to fetch the very first state of set of Satellites
-    /** PLACEHOLDER TODO: CHANGE WITH ACTUAL DATA FETCHING AND RETURN ALL THE SATS **/
-    return Satellite.genRandomSats(4);
-  }
+  private initSatellites = () => {
+    const dataFetch = async () => {
+      // Fetch data
+      var sats_data = await (await fetch("web_data.json")).json();
+      // Sort by name
+      sats_data = sats_data.sort((
+        a: any,
+        b: any,
+      ) => ((a["Official Name of Satellite"] < b["Official Name of Satellite"])
+        ? -1
+        : ((a["Official Name of Satellite"] > b["Official Name of Satellite"])
+          ? 1
+          : 0))
+      );
 
-  constructor(setSats: React.Dispatch<React.SetStateAction<SatelliteType[]>>) {
-    this.allSattelites = Satellite.getInitialSetOfSats();
-    this.setSattelites = setSats;
-  }
+      this.satelliteData = sats_data;
 
-  public getSatellites(): SatelliteType[] {
-    return this.allSattelites;
-  }
+      this.updateLocation();
+    };
 
-  public chooseSat = (sattelite: SatelliteType) => {
-    this.allSattelites = [sattelite];
-    console.log("All sats are now: ", this.allSattelites);
-    this.setSattelites([sattelite]);
+    dataFetch();
   };
 
-  public removeFilter = () => {
-    this.allSattelites = Satellite.getInitialSetOfSats();
-    this.setSattelites(this.allSattelites);
-  };
+  static getEmptyMetadata() {
+    return {
+      "Country/Organization of UN Registry": [],
+      Users: [],
+      Purpose: [],
+      Contractor: [],
+      "Operator/Owner": [],
+    };
+  }
 }
 
 export { Satellite };

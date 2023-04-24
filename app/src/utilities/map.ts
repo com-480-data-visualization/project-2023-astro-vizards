@@ -8,6 +8,7 @@ import Basemap from "@arcgis/core/Basemap.js";
 import Map from "@arcgis/core/Map";
 import React from "react";
 import { SatelliteType } from "../types";
+import { Satellite } from "./satellite";
 const simpleMarkerSymbol = {
   type: "simple-marker",
   color: [226, 119, 40], // Orange
@@ -26,13 +27,13 @@ const simpleMarkerSymbolDark = {
   },
 };
 
-const getTextSymbol = (x: number) => {
+const getTextSymbol = (name: string) => {
   return {
     type: "text", // autocasts as new TextSymbol()
     color: "white",
     haloColor: "black",
     haloSize: "1px",
-    text: "Satellite" + x,
+    text: name,
     xoffset: 3,
     yoffset: 3,
     font: {
@@ -80,25 +81,65 @@ const clearAllPoints = (view: MapView) => {
 };
 
 const drawPoint = (view: MapView, satellite: SatelliteType) => {
-  console.log("drawing: ", satellite);
+  // console.log("drawing: ", satellite);
   const p = new Point({
-    longitude: satellite.longtitude,
+    longitude: satellite.longitude,
     latitude: satellite.latitude,
   });
   const g = new Graphic({
-    symbol: getTextSymbol(satellite.id),
+    symbol: getTextSymbol(satellite.name),
     geometry: p,
   });
   view.graphics.add(g);
   current_points[satellite.id] = g;
 };
 
-const drawMultiplePoints = (view: MapView, satellites: SatelliteType[]) => {
-  if (satellites.length == 0) return;
+const drawOrbit = (view: MapView, satellite: SatelliteType, satelliteManager: Satellite) => {
+  const point_orbits = satelliteManager.getOrbit(satellite.id);
+
+  let polyline = {
+    type: "polyline",  // autocasts as new Polyline()
+    paths: point_orbits,
+    hasZ: false,
+    hasM: false,
+  };
+
+  let polylineSymbol = {
+    type: "simple-line",  // autocasts as SimpleLineSymbol()
+    color: [226, 119, 40],
+    width: 4
+  };
+
+  let polylineAtt = {
+    // Name: "Keystone Pipeline",
+    // Owner: "TransCanada"
+  };
+
+  let g = new Graphic({
+    geometry: polyline,
+    symbol: polylineSymbol,
+    attributes: polylineAtt
+  });
+  view.graphics.add(g);
+}
+
+const drawMultiplePoints = (view: MapView, satellites: SatelliteType[], satelliteManager: Satellite) => {
+  // Draw satellites
+  if (satellites.length === 0) return;
+
+  // Draw orbit if we have a few satellites
+  if (satellites.length < 10) {
+    satellites.forEach( (sat) => {
+      drawOrbit(view, sat, satelliteManager);
+    })
+  }
+
   satellites.forEach((sat) => {
     drawPoint(view, sat);
   });
-  if (satellites.length == 1) {
+
+  // Zoom in case of having selected one satellite
+  if (satellites.length === 1) {
     view.goTo(current_points[satellites[0].id]);
     view.set("zoom", 3);
   } else {
