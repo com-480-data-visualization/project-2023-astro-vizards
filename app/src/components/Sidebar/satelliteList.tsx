@@ -18,8 +18,13 @@ interface SidebarProps {
   setFilters: React.Dispatch<React.SetStateAction<FilterType>>;
 }
 
-export function SatelliteList({ satellites , satelliteManager, filters, setFilters }: SidebarProps) {
-  const [searchValue, setSearchValue] = useState('');
+export function SatelliteList({
+  satellites,
+  satelliteManager,
+  filters,
+  setFilters,
+}: SidebarProps) {
+  const [searchValue, setSearchValue] = useState("");
   const [selectedSatellites, setSelectedSatellites] = useState<number[]>([]);
   const [focusedSatellite, setFocusedSatellite] = useState<number>(-1);
 
@@ -32,15 +37,15 @@ export function SatelliteList({ satellites , satelliteManager, filters, setFilte
     setSearchValue(value.toLowerCase());
   };
 
-  const onSelect = (selected:any, info:any) => {
+  const onSelect = (selected: any, info: any) => {
     setFocusedSatellite(selected[0]);
     const filter_new = filters;
-    filter_new['id'] = [ selected[0] ];
+    filter_new["id"] = [selected[0]];
     setFilters(filter_new);
     satelliteManager.filter(filter_new);
-  }
+  };
 
-  const onCheck = (checkedKeys:any, info:any) => {
+  const onCheck = (checkedKeys: any, info: any) => {
     // setSelectedSatellites(checkedKeys);
     // if (checkedKeys.length > 0) {
     //   const filter_new = filters;
@@ -53,42 +58,54 @@ export function SatelliteList({ satellites , satelliteManager, filters, setFilte
     //   setFilters(filter_new);
     //   satelliteManager.filter(filter_new);
     // }
-  }
+  };
 
   const treeData = useMemo(() => {
     const sats_list = [];
-    for (let i=0; i<satellites.length; i++) {
+    for (let i = 0; i < satellites.length; i++) {
       const sat = satellites[i];
-      if (searchValue === null || searchValue === '' || sat.name.toLowerCase().includes(searchValue)) {
-        const elem = 
-          <span>
-            {sat.name}
-          </span>
+      if (
+        searchValue === null ||
+        searchValue === "" ||
+        sat.name.toLowerCase().includes(searchValue)
+      ) {
+        const elem = <span>{sat.name}</span>;
         sats_list.push({
           title: elem,
           key: sat.id,
-          icon: '🛰️'
-        })
+          icon: "🛰️",
+        });
       }
     }
     return sats_list;
   }, [searchValue, satellites]);
 
-  const onCloseDrawer = (e:any) => {
+  const onCloseDrawer = (e: any) => {
     setFocusedSatellite(-1);
     const filter_new = filters;
-    delete filter_new['id'];
+    delete filter_new["id"];
     setFilters(filter_new);
     satelliteManager.filter(filter_new);
-  }
+  };
 
   const open_drawer = focusedSatellite >= 0;
   const info_sat = satelliteManager.getInfo(focusedSatellite);
 
   const { Search } = Input;
   return (
-    <Sider width={200} style={{ background: colorBgContainer }}>
-      <Search style={{ marginBottom: 8, marginTop: 8 }} placeholder="Search" onChange={onChange} />
+    <Sider
+      width={200}
+      style={{
+        background: colorBgContainer,
+        maxHeight: "100vh",
+        overflow: "auto",
+      }}
+    >
+      <Search
+        style={{ marginBottom: 8, marginTop: 8 }}
+        placeholder="Search"
+        onChange={onChange}
+      />
       <Tree
         treeData={treeData}
         height={400}
@@ -97,14 +114,18 @@ export function SatelliteList({ satellites , satelliteManager, filters, setFilte
         onSelect={onSelect}
         onCheck={onCheck}
       />
-      <div style={{textAlign: 'center', marginTop: '0.25rem', paddingTop: '0.5rem', borderTop: '1px solid black'}}>
+      <div
+        style={{
+          textAlign: "center",
+          marginTop: "0.25rem",
+          paddingTop: "0.5rem",
+          borderTop: "1px solid black",
+        }}
+      >
         {satellites.length} satellites
       </div>
-      <Drawer
-            open={open_drawer}
-            onClose={onCloseDrawer}
-            >
-          <InfoSatellite data={info_sat}/>
+      <Drawer open={open_drawer} onClose={onCloseDrawer}>
+        <InfoSatellite data={info_sat} />
       </Drawer>
     </Sider>
   );

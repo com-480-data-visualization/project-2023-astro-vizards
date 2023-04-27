@@ -17,7 +17,12 @@ interface SidebarProps {
   setFilters: React.Dispatch<React.SetStateAction<FilterType>>;
 }
 
-export function FilterList({ metadata, satelliteManager, filters, setFilters }: SidebarProps) {
+export function FilterList({
+  metadata,
+  satelliteManager,
+  filters,
+  setFilters,
+}: SidebarProps) {
   // const [filtered, setFiltered] = useState(false);
 
   const {
@@ -83,54 +88,63 @@ export function FilterList({ metadata, satelliteManager, filters, setFilters }: 
   //   };
   // });
 
-  const items : any[] = [];
+  const items: any[] = [];
   // const keys = Object.keys(metadata);
   const entries = Object.entries(metadata);
-  for(let i=0; i<entries.length; i++) {
+  for (let i = 0; i < entries.length; i++) {
     const name = entries[i][0];
     const data = entries[i][1];
 
-    let children : any[] = [];
-    for(let j=0; j<data.length; j++) {
-      if ( !(name in filters) || filters[name].includes(data[j]) ) {
+    let children: any[] = [];
+    for (let j = 0; j < data.length; j++) {
+      if (!(name in filters) || filters[name].includes(data[j])) {
         children.push({
           key: `${name}-${data[j]}`,
           label: `${data[j]}`,
           icon: undefined,
           onClick: () => {
             const filter_new = filters;
-            filter_new[name] = [ data[j] ];
+            filter_new[name] = [data[j]];
             setFilters(filter_new);
             satelliteManager.filter(filter_new);
           },
-        })
+        });
       }
     }
 
     if (name in filters) {
-      children = children.concat([{
-        key: "filtered",
-        label: "Remove Filter",
-        icon: React.createElement(CloseCircleOutlined),
-        onClick: () => {
-          const filter_new = filters;
-          delete filter_new[name];
-          setFilters(filter_new);
-          satelliteManager.filter(filter_new);
+      children = children.concat([
+        {
+          key: "filtered",
+          label: "Remove Filter",
+          icon: React.createElement(CloseCircleOutlined),
+          onClick: () => {
+            const filter_new = filters;
+            delete filter_new[name];
+            setFilters(filter_new);
+            satelliteManager.filter(filter_new);
+          },
         },
-      }])
+      ]);
     }
 
     items.push({
       key: `${name}-${i}`,
-      icon: '',
+      icon: "",
       label: `${name}`,
-      children: children
-    })
+      children: children,
+    });
   }
 
   return (
-    <Sider width={200} style={{ background: colorBgContainer }}>
+    <Sider
+      width={200}
+      style={{
+        background: colorBgContainer,
+        maxHeight: "100vh",
+        overflow: "auto",
+      }}
+    >
       <Menu
         mode="inline"
         // defaultSelectedKeys={["1"]}
