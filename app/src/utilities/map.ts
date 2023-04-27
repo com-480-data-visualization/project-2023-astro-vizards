@@ -1,150 +1,148 @@
-import MapView from "@arcgis/core/views/MapView";
+import SceneView from "@arcgis/core/views/MapView";
 import Graphic from "@arcgis/core/Graphic";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import Point from "@arcgis/core/geometry/Point";
-import Bookmarks from "@arcgis/core/widgets/Bookmarks";
-import Expand from "@arcgis/core/widgets/Expand";
+import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import Basemap from "@arcgis/core/Basemap.js";
 import Map from "@arcgis/core/Map";
 import React from "react";
 import { SatelliteType } from "../types";
 import { Satellite } from "./satellite";
-const simpleMarkerSymbol = {
-  type: "simple-marker",
-  color: [226, 119, 40], // Orange
-  outline: {
-    color: [255, 255, 255], // White
-    width: 1,
-  },
-};
-
-const simpleMarkerSymbolDark = {
-  type: "simple-marker",
-  color: [226, 119, 40], // Orange
-  outline: {
-    color: [0, 0, 0], // White
-    width: 1,
-  },
-};
+import { Satellite as satelliteIcon } from "../images";
 
 const getTextSymbol = (name: string) => {
-  return {
-    type: "text", // autocasts as new TextSymbol()
-    color: "white",
-    haloColor: "black",
-    haloSize: "1px",
-    text: name,
-    xoffset: 3,
-    yoffset: 3,
-    font: {
-      // autocasts as new Font()
-      size: 12,
-      family: "Roboto",
-      weight: "bold",
-    },
-  };
+  const symbol = new SimpleMarkerSymbol();
+  symbol.set("path", satelliteIcon);
+  symbol.set("outline", null);
+  symbol.set("color", "white");
+  symbol.set("size", 12);
+  return symbol;
 };
 
-let current_points: Record<number, Graphic>;
+class MapManager {
+  private view: SceneView;
+  private current_points: Record<number, Graphic>;
+  private setFocusedSat: React.Dispatch<React.SetStateAction<number>>;
+  constructor(
+    setFocusedSattelite: React.Dispatch<React.SetStateAction<number>>
+  ) {
+    /**
+     * Initialize application
+     */
+    this.setFocusedSat = setFocusedSattelite;
+    console.log("Constructing map.");
+    this.current_points = [];
 
-const initMap = () => {
-  /**
-   * Initialize application
-   */
-  console.log("Constructing map.");
-  current_points = [];
-  // Please check https://developers.arcgis.com/javascript/latest/api-reference/esri-Map.html#basemap for all possible map variants
-  const baseMap = Basemap.fromId("arcgis-nova");
-  const map = new Map({
-    basemap: baseMap,
-  });
-  const view = new MapView({
-    container: undefined,
-    map: map,
-  });
+    const map = new Map({
+      basemap: "hybrid",
+    });
+    this.view = new SceneView({
+      container: undefined,
+      map: map,
+    });
 
-  const graphicsLayer = new GraphicsLayer();
-  view.map.add(graphicsLayer);
-  return view;
-};
-
-const attachToContainer = (
-  view: MapView,
-  ref: React.RefObject<HTMLDivElement>
-) => {
-  view.set("container", ref.current);
-};
-
-const clearAllPoints = (view: MapView) => {
-  view.graphics.removeAll();
-  current_points = [];
-};
-
-const drawPoint = (view: MapView, satellite: SatelliteType) => {
-  // console.log("drawing: ", satellite);
-  const p = new Point({
-    longitude: satellite.longitude,
-    latitude: satellite.latitude,
-  });
-  const g = new Graphic({
-    symbol: getTextSymbol(satellite.name),
-    geometry: p,
-  });
-  view.graphics.add(g);
-  current_points[satellite.id] = g;
-};
-
-const drawOrbit = (view: MapView, satellite: SatelliteType, satelliteManager: Satellite) => {
-  const point_orbits = satelliteManager.getOrbit(satellite.id);
-
-  let polyline = {
-    type: "polyline",  // autocasts as new Polyline()
-    paths: point_orbits,
-    hasZ: false,
-    hasM: false,
+    const graphicsLayer = new GraphicsLayer();
+    this.view.map.add(graphicsLayer);
+    const tempThis = this;
+    this.view.on("click", function(event) {
+      var screenPoint = {
+        x: event.x,
+        y: event.y,
+      };
+      // Search for graphics at the clicked location
+      tempThis.view.hitTest(screenPoint).then((response) => {
+        if (response.results.length < 1) return;
+        const selectedGraphic = response.results[0];
+        if (selectedGraphic != undefined && !selectedGraphic.type) return;
+        if (selectedGraphic.type != "graphic") return;
+        const satId = selectedGraphic.graphic.attributes.satellite_id;
+        tempThis.setFocusedSat(satId);
+        tempThis.view.goTo(tempThis.current_points[satId]);
+        tempThis.view.set("zoom", 5);
+      });
+    });
+  }
+  attachToContainer = (ref: React.RefObject<HTMLDivElement>) => {
+    this.view.set("container", ref.current);
   };
 
-  let polylineSymbol = {
-    type: "simple-line",  // autocasts as SimpleLineSymbol()
-    color: [226, 119, 40],
-    width: 4
+  clearAllPoints = () => {
+    this.view.graphics.removeAll();
+    this.current_points = [];
   };
 
-  let polylineAtt = {
-    // Name: "Keystone Pipeline",
-    // Owner: "TransCanada"
+  drawPoint = (satellite: SatelliteType) => {
+    // console.log("drawing: ", satellite);
+    const p = new Point({
+      longitude: satellite.longitude,
+      latitude: satellite.latitude,
+    });
+    const g = new Graphic({
+      symbol: getTextSymbol("satellite_alt"),
+      geometry: p,
+      attributes: {
+        satellite_id: satellite.id,
+      },
+    });
+    this.view.graphics.add(g);
+    this.current_points[satellite.id] = g;
   };
 
-  let g = new Graphic({
-    geometry: polyline,
-    symbol: polylineSymbol,
-    attributes: polylineAtt
-  });
-  view.graphics.add(g);
+  drawOrbit = (satellite: SatelliteType, satelliteManager: Satellite) => {
+    const point_orbits = satelliteManager.getOrbit(satellite.id);
+
+    let polyline = {
+      type: "polyline", // autocasts as new Polyline()
+      paths: point_orbits,
+      hasZ: false,
+      hasM: false,
+    };
+
+    let polylineSymbol = {
+      type: "simple-line", // autocasts as SimpleLineSymbol()
+      color: [226, 119, 40],
+      width: 4,
+    };
+
+    let polylineAtt = {
+      // Name: "Keystone Pipeline",
+      // Owner: "TransCanada"
+    };
+
+    let g = new Graphic({
+      geometry: polyline,
+      symbol: polylineSymbol,
+      attributes: polylineAtt,
+    });
+    this.view.graphics.add(g);
+  };
+
+  drawMultiplePoints = (
+    satellites: SatelliteType[],
+    satelliteManager: Satellite
+  ) => {
+    // Draw satellites
+    if (satellites.length === 0) return;
+
+    // Draw orbit if we have a few satellites
+    if (satellites.length < 10) {
+      satellites.forEach((sat) => {
+        this.drawOrbit(sat, satelliteManager);
+      });
+    }
+
+    satellites.forEach((sat) => {
+      this.drawPoint(sat);
+    });
+
+    // Zoom in case of having selected one satellite
+    if (satellites.length === 1) {
+      this.view.goTo(this.current_points[satellites[0].id]);
+      this.view.set("zoom", 3);
+    } else {
+      this.view.set("zoom", 1);
+    }
+  };
 }
 
-const drawMultiplePoints = (view: MapView, satellites: SatelliteType[], satelliteManager: Satellite) => {
-  // Draw satellites
-  if (satellites.length === 0) return;
-
-  // Draw orbit if we have a few satellites
-  if (satellites.length < 10) {
-    satellites.forEach( (sat) => {
-      drawOrbit(view, sat, satelliteManager);
-    })
-  }
-
-  satellites.forEach((sat) => {
-    drawPoint(view, sat);
-  });
-
-  // Zoom in case of having selected one satellite
-  if (satellites.length === 1) {
-    view.goTo(current_points[satellites[0].id]);
-    view.set("zoom", 3);
-  } else {
-    view.set("zoom", 1);
-  }
-};
-
-export { initMap, attachToContainer, clearAllPoints, drawMultiplePoints };
+export { MapManager };

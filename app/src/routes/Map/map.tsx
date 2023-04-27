@@ -2,17 +2,17 @@ import "./map.scss";
 
 import React, { FC, useEffect, useRef } from "react";
 import MapView from "@arcgis/core/views/MapView";
-import { attachToContainer } from "../../utilities";
+import { MapManager } from "../../utilities";
 interface MapPageProps {
-  view: MapView;
+  mapManager: MapManager;
 }
 
-const MapPage = ({ view }: MapPageProps) => {
+const MapPage = ({ mapManager }: MapPageProps) => {
   const ref = useRef(null);
 
   useEffect(() => {
     if (!ref || !ref.current) return;
-    attachToContainer(view, ref);
+    mapManager.attachToContainer(ref);
   }, []);
 
   return <div className="home__map" ref={ref}></div>;

@@ -1,21 +1,19 @@
 import { Menu, MenuProps, theme, Input, Tree, Drawer } from "antd";
 import Sider from "antd/es/layout/Sider";
-import {
-  LaptopOutlined,
-  NotificationOutlined,
-  UserOutlined,
-  CloseCircleOutlined,
-} from "@ant-design/icons";
+
 import React, { useState, useMemo } from "react";
 import { SatelliteType, FilterType } from "../../types";
 import { Satellite } from "../../utilities";
-import { InfoSatellite } from "./infoSatellite";
 
 interface SidebarProps {
   satellites: SatelliteType[];
   satelliteManager: Satellite;
   filters: FilterType;
   setFilters: React.Dispatch<React.SetStateAction<FilterType>>;
+  setSearchValue: React.Dispatch<React.SetStateAction<string>>;
+  setFocusedSatellite: React.Dispatch<React.SetStateAction<number>>;
+  searchValue: string;
+  focusedSatellite: number;
 }
 
 export function SatelliteList({
@@ -23,11 +21,11 @@ export function SatelliteList({
   satelliteManager,
   filters,
   setFilters,
+  setFocusedSatellite,
+  setSearchValue,
+  searchValue,
+  focusedSatellite,
 }: SidebarProps) {
-  const [searchValue, setSearchValue] = useState("");
-  const [selectedSatellites, setSelectedSatellites] = useState<number[]>([]);
-  const [focusedSatellite, setFocusedSatellite] = useState<number>(-1);
-
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -80,17 +78,6 @@ export function SatelliteList({
     return sats_list;
   }, [searchValue, satellites]);
 
-  const onCloseDrawer = (e: any) => {
-    setFocusedSatellite(-1);
-    const filter_new = filters;
-    delete filter_new["id"];
-    setFilters(filter_new);
-    satelliteManager.filter(filter_new);
-  };
-
-  const open_drawer = focusedSatellite >= 0;
-  const info_sat = satelliteManager.getInfo(focusedSatellite);
-
   const { Search } = Input;
   return (
     <Sider
@@ -124,9 +111,6 @@ export function SatelliteList({
       >
         {satellites.length} satellites
       </div>
-      <Drawer open={open_drawer} onClose={onCloseDrawer}>
-        <InfoSatellite data={info_sat} />
-      </Drawer>
     </Sider>
   );
 }
