@@ -19,7 +19,6 @@ function Home() {
       "url(/Users/aybarsyazici/Documents/EPFL/DataViz/project-2023-astro-vizards/app/fonts)";
   }, []);
   const [searchValue, setSearchValue] = useState("");
-  const [selectedSatellites, setSelectedSatellites] = useState<number[]>([]);
   const [focusedSatellite, setFocusedSatellite] = useState<number>(-1);
   const [satellites, setSatellites] = useState<SatelliteType[]>([]);
   const [metadata, setMetadata] = useState<SatelliteMetadata>(
@@ -31,9 +30,7 @@ function Home() {
     const satMan = new Satellite(setSatellites, setMetadata);
     return satMan;
   }, []);
-  // const [satellites, setSatellites] = useState<SatelliteType[]>(
-  //   Satellite.getInitialSetOfSats()
-  // );
+
   const [filters, setFilters] = useState<FilterType>({});
 
   useEffect(() => {
