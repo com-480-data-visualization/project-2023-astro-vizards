@@ -1,0 +1,17 @@
+.filterList {
+  position: relative;
+  overflow: visible !important;
+
+  &__icon {
+    position: absolute;
+    bottom: 50%;
+    color: gray;
+    cursor: pointer;
+    transition: all 0.1s linear;
+    font-size: 1.25rem;
+
+    &:hover {
+      transform: scale(1.25);
+    }
+  }
+}

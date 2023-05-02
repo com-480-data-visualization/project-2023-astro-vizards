@@ -5,6 +5,8 @@ import React, { useEffect } from "react";
 import { FilterType, SatelliteMetadata } from "../../types";
 import { Satellite } from "../../utilities";
 import Search from "antd/es/input/Search";
+import { RightCircleOutlined, LeftCircleOutlined } from "@ant-design/icons";
+import "./filter-list.scss";
 
 interface SidebarProps {
   metadata: SatelliteMetadata;
@@ -25,6 +27,7 @@ export function FilterList({
   const items: any[] = [];
   const [entries, setEntries] = React.useState(Object.entries(metadata));
   const [searchVal, setSearchVal] = React.useState("");
+  const [collapsed, setCollapsed] = React.useState(true);
 
   useEffect(() => {
     const temp: [string, string[]][] = Object.entries(metadata).map((entry) => {
@@ -91,19 +94,37 @@ export function FilterList({
 
   return (
     <Sider
+      className="filterList"
       width={200}
+      collapsed={collapsed}
       style={{
         background: colorBgContainer,
         maxHeight: "100vh",
         overflow: "auto",
       }}
     >
-      <Search
-        placeholder="input search text"
-        onSearch={(val, e) => console.log(val, e)}
-        onChange={(e) => setSearchVal(e.target.value)}
-        style={{ width: 200 }}
-      />
+      {collapsed ? (
+        <RightCircleOutlined
+          className="filterList__icon filterList__icon--collapsed"
+          style={{ right: "-12.5%" }}
+          onClick={() => setCollapsed(!collapsed)}
+        />
+      ) : (
+        <LeftCircleOutlined
+          className="filterList__icon"
+          style={{ right: "-5%" }}
+          onClick={() => setCollapsed(!collapsed)}
+        />
+      )}
+
+      {!collapsed && (
+        <Search
+          placeholder="input search text"
+          onSearch={(val, e) => console.log(val, e)}
+          onChange={(e) => setSearchVal(e.target.value)}
+          style={{ width: 200 }}
+        />
+      )}
 
       <Menu
         mode="inline"
