@@ -24,12 +24,12 @@ export function FilterList({
   const {
     token: { colorBgContainer },
   } = theme.useToken();
-  const items: any[] = [];
   const [entries, setEntries] = React.useState(Object.entries(metadata));
   const [searchVal, setSearchVal] = React.useState("");
   const [collapsed, setCollapsed] = React.useState(true);
 
   useEffect(() => {
+    console.log("Filtering...");
     const temp: [string, string[]][] = Object.entries(metadata).map((entry) => {
       return [
         entry[0],
@@ -42,55 +42,57 @@ export function FilterList({
       ];
     });
 
-    console.log("Temp is:", temp);
-    console.log("Expected res", Object.entries(metadata));
     setEntries(temp);
   }, [metadata, searchVal]);
 
-  for (let i = 0; i < entries.length; i++) {
-    const name = entries[i][0];
-    const data = entries[i][1];
+  const items = React.useMemo(
+    () =>
+      entries.map((entry, index) => {
+        const name = entry[0];
+        const data = entry[1];
 
-    let children: any[] = [];
-    for (let j = 0; j < data.length; j++) {
-      if (!(name in filters) || filters[name].includes(data[j])) {
-        children.push({
-          key: `${name}-${data[j]}`,
-          label: `${data[j]}`,
-          icon: undefined,
-          onClick: () => {
-            const filter_new = filters;
-            filter_new[name] = [data[j]];
-            setFilters(filter_new);
-            satelliteManager.filter(filter_new);
-          },
-        });
-      }
-    }
+        let children: any[] = [];
+        for (let j = 0; j < data.length; j++) {
+          if (!(name in filters) || filters[name].includes(data[j])) {
+            children.push({
+              key: `${name}-${data[j]}`,
+              label: `${data[j]}`,
+              icon: undefined,
+              onClick: () => {
+                const filter_new = filters;
+                filter_new[name] = [data[j]];
+                setFilters(filter_new);
+                satelliteManager.filter(filter_new);
+              },
+            });
+          }
+        }
 
-    if (name in filters) {
-      children = children.concat([
-        {
-          key: "filtered",
-          label: "Remove Filter",
-          icon: React.createElement(CloseCircleOutlined),
-          onClick: () => {
-            const filter_new = filters;
-            delete filter_new[name];
-            setFilters(filter_new);
-            satelliteManager.filter(filter_new);
-          },
-        },
-      ]);
-    }
+        if (name in filters) {
+          children = children.concat([
+            {
+              key: "filtered",
+              label: "Remove Filter",
+              icon: React.createElement(CloseCircleOutlined),
+              onClick: () => {
+                const filter_new = filters;
+                delete filter_new[name];
+                setFilters(filter_new);
+                satelliteManager.filter(filter_new);
+              },
+            },
+          ]);
+        }
 
-    items.push({
-      key: `${name}-${i}`,
-      icon: "",
-      label: `${name}`,
-      children: children,
-    });
-  }
+        return {
+          key: `${name}-${index}`,
+          icon: "",
+          label: `${name}`,
+          children: children,
+        };
+      }),
+    [entries]
+  );
 
   return (
     <Sider
