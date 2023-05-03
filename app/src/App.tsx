@@ -15,8 +15,6 @@ function Home() {
   useEffect(() => {
     Config.apiKey =
       "AAPK1f6518e2b8eb428fbfacdb052c7ae46fBc6HgV5-adthrrY302f_qj1JtbLKYYV_9JKnXXR5OjnDaow1DiWmSzJHgmrj4xZ0";
-    Config.fontsUrl =
-      "url(/Users/aybarsyazici/Documents/EPFL/DataViz/project-2023-astro-vizards/app/fonts)";
   }, []);
   const [searchValue, setSearchValue] = useState("");
   const [focusedSatellite, setFocusedSatellite] = useState<number>(-1);
@@ -25,7 +23,16 @@ function Home() {
     Satellite.getEmptyMetadata()
   );
 
-  const mapManager = useMemo(() => new MapManager(setFocusedSatellite), []);
+  const mapManager = useMemo(
+    () =>
+      new MapManager(setFocusedSatellite, (selectedGraphic, _this) => {
+        const satId = selectedGraphic.attributes.satellite_id;
+        _this.setFocusedSat(satId);
+        _this.getView().goTo(_this.getCurrentPoints()[satId]);
+        _this.getView().set("zoom", 5);
+      }),
+    []
+  );
   const satelliteManager = useMemo(() => {
     const satMan = new Satellite(setSatellites, setMetadata);
     return satMan;

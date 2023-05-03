@@ -22,9 +22,10 @@ const getTextSymbol = (name: string) => {
 class MapManager {
   private view: SceneView;
   private current_points: Record<number, Graphic>;
-  private setFocusedSat: React.Dispatch<React.SetStateAction<number>>;
+  public setFocusedSat: React.Dispatch<React.SetStateAction<number>>;
   constructor(
-    setFocusedSattelite: React.Dispatch<React.SetStateAction<number>>
+    setFocusedSattelite: React.Dispatch<React.SetStateAction<number>>,
+    onClick: (selectedGraphic: Graphic, _this: MapManager) => void
   ) {
     /**
      * Initialize application
@@ -32,7 +33,6 @@ class MapManager {
     this.setFocusedSat = setFocusedSattelite;
     console.log("Constructing map.");
     this.current_points = [];
-
     const map = new Map({
       basemap: "hybrid",
     });
@@ -55,10 +55,7 @@ class MapManager {
         const selectedGraphic = response.results[0];
         if (selectedGraphic != undefined && !selectedGraphic.type) return;
         if (selectedGraphic.type != "graphic") return;
-        const satId = selectedGraphic.graphic.attributes.satellite_id;
-        tempThis.setFocusedSat(satId);
-        tempThis.view.goTo(tempThis.current_points[satId]);
-        tempThis.view.set("zoom", 5);
+        onClick(selectedGraphic.graphic, tempThis);
       });
     });
   }
@@ -143,6 +140,10 @@ class MapManager {
       this.view.set("zoom", 1);
     }
   };
+
+  getView = () => this.view;
+
+  getCurrentPoints = () => this.current_points;
 }
 
 export { MapManager };
