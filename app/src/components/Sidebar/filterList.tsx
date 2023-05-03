@@ -122,6 +122,7 @@ export function FilterList({
       {!collapsed && (
         <Search
           placeholder="input search text"
+          defaultValue={searchVal}
           onSearch={(val, e) => console.log(val, e)}
           onChange={(e) => setSearchVal(e.target.value)}
           style={{ width: 200 }}
