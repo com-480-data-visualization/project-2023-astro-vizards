@@ -30,6 +30,10 @@ function Home() {
         _this.setFocusedSat(satId);
         _this.getView().goTo(_this.getCurrentPoints()[satId]);
         _this.getView().set("zoom", 5);
+        _this.drawOrbit(
+          satelliteManager.getSatellites()[satId],
+          satelliteManager
+        );
       }),
     []
   );
