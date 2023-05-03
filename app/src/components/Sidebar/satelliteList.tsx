@@ -1,7 +1,7 @@
-import { Menu, MenuProps, theme, Input, Tree, Drawer } from "antd";
+import { theme, Input, Tree } from "antd";
 import Sider from "antd/es/layout/Sider";
 
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { SatelliteType, FilterType } from "../../types";
 import { Satellite } from "../../utilities";
 
@@ -24,7 +24,6 @@ export function SatelliteList({
   setFocusedSatellite,
   setSearchValue,
   searchValue,
-  focusedSatellite,
 }: SidebarProps) {
   const {
     token: { colorBgContainer },

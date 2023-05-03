@@ -1,15 +1,11 @@
-import React from "react";
-
 interface SidebarProps {
-    data: any
+    data: any;
 }
 
 export function InfoSatellite({ data }: SidebarProps) {
     if (data == null) {
-        return <div></div>
+        return <div></div>;
     }
 
-    return (
-        <h1> Information </h1>
-    );
+    return <h1> Information </h1>;
 }

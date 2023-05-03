@@ -3,14 +3,13 @@ import Graphic from "@arcgis/core/Graphic";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import Point from "@arcgis/core/geometry/Point";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
-import Basemap from "@arcgis/core/Basemap.js";
 import Map from "@arcgis/core/Map";
 import React from "react";
 import { SatelliteType } from "../types";
 import { Satellite } from "./satellite";
 import { Satellite as satelliteIcon } from "../images";
 
-const getTextSymbol = (name: string) => {
+const getTextSymbol = () => {
   const symbol = new SimpleMarkerSymbol();
   symbol.set("path", satelliteIcon);
   symbol.set("outline", null);
@@ -22,9 +21,10 @@ const getTextSymbol = (name: string) => {
 class MapManager {
   private view: SceneView;
   private current_points: Record<number, Graphic>;
-  private setFocusedSat: React.Dispatch<React.SetStateAction<number>>;
+  public setFocusedSat: React.Dispatch<React.SetStateAction<number>>;
   constructor(
-    setFocusedSattelite: React.Dispatch<React.SetStateAction<number>>
+    setFocusedSattelite: React.Dispatch<React.SetStateAction<number>>,
+    onClick: (selectedGraphic: Graphic, _this: MapManager) => void
   ) {
     /**
      * Initialize application
@@ -32,7 +32,6 @@ class MapManager {
     this.setFocusedSat = setFocusedSattelite;
     console.log("Constructing map.");
     this.current_points = [];
-
     const map = new Map({
       basemap: "hybrid",
     });
@@ -55,10 +54,8 @@ class MapManager {
         const selectedGraphic = response.results[0];
         if (selectedGraphic != undefined && !selectedGraphic.type) return;
         if (selectedGraphic.type != "graphic") return;
-        const satId = selectedGraphic.graphic.attributes.satellite_id;
-        tempThis.setFocusedSat(satId);
-        tempThis.view.goTo(tempThis.current_points[satId]);
-        tempThis.view.set("zoom", 5);
+        // Callback
+        onClick(selectedGraphic.graphic, tempThis);
       });
     });
   }
@@ -72,13 +69,12 @@ class MapManager {
   };
 
   drawPoint = (satellite: SatelliteType) => {
-    // console.log("drawing: ", satellite);
     const p = new Point({
       longitude: satellite.longitude,
       latitude: satellite.latitude,
     });
     const g = new Graphic({
-      symbol: getTextSymbol("satellite_alt"),
+      symbol: getTextSymbol(),
       geometry: p,
       attributes: {
         satellite_id: satellite.id,
@@ -143,6 +139,10 @@ class MapManager {
       this.view.set("zoom", 1);
     }
   };
+
+  getView = () => this.view;
+
+  getCurrentPoints = () => this.current_points;
 }
 
 export { MapManager };

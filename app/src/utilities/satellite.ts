@@ -8,13 +8,8 @@ import {
   propagate,
   twoline2satrec,
 } from "satellite.js";
-import { useState } from "react";
-import 'moment';
+import "moment";
 import moment from "moment";
-
-// function randomInt(max: number) {
-//   return Math.ceil(Math.random() * max) * (Math.round(Math.random()) ? 1 : -1);
-// }
 
 class Satellite {
   private setSatellites: React.Dispatch<React.SetStateAction<SatelliteType[]>>;
@@ -26,7 +21,7 @@ class Satellite {
 
   constructor(
     setSats: React.Dispatch<React.SetStateAction<SatelliteType[]>>,
-    setMetadata: React.Dispatch<React.SetStateAction<SatelliteMetadata>>,
+    setMetadata: React.Dispatch<React.SetStateAction<SatelliteMetadata>>
   ) {
     this.setSatellites = setSats;
     this.setMetadata = setMetadata;
@@ -40,31 +35,31 @@ class Satellite {
 
   public getSatellites = () => {
     return this.allSattelites.filter((sat) => sat.selected);
-  }
+  };
 
   public getInfo = (id: number) => {
-    return (id >= 0) ? this.satelliteData[id] : null;
-  }
+    return id >= 0 ? this.satelliteData[id] : null;
+  };
 
   public setDate = (date: Date) => {
     this.date = date;
-  }
+  };
 
   public getOrbit = (id: number) => {
     // Compute period of orbit
     const satrec = twoline2satrec(
       this.satelliteData[id]["LINE1"],
-      this.satelliteData[id]["LINE2"],
+      this.satelliteData[id]["LINE2"]
     );
 
     const line2 = this.satelliteData[id]["LINE2"] as string;
     const mo = line2.substring(52, 62);
-    const period = 1.0 / parseFloat(mo) * 24;
-    
+    const period = (1.0 / parseFloat(mo)) * 24;
+
     const halfPeriod = period / 2.0;
-    
+
     console.log("Period " + period);
-  
+
     // Compute sampling points
     // const N = 30;
     // const FACTOR = 0.925;
@@ -83,7 +78,9 @@ class Satellite {
     const initial = moment(this.date);
     while (true) {
       const step = period * 0.01;
-      const current_date = moment(initial).add(step * i * sign, 'h').toDate();
+      const current_date = moment(initial)
+        .add(step * i * sign, "h")
+        .toDate();
 
       const positionAndVelocity = propagate(satrec, current_date);
       const positionEci = positionAndVelocity.position as EciVec3<number>;
@@ -96,7 +93,7 @@ class Satellite {
         points.push([longitudeDeg, latitudeDeg]);
         console.dir([longitudeDeg, latitudeDeg]);
         i += 1;
-        continue
+        continue;
       }
 
       if (i >= MAX_N) {
@@ -104,7 +101,10 @@ class Satellite {
         break;
       }
 
-      if (Math.sign(longitudeDeg) !== Math.sign(points[i-1][0]) && Math.abs(longitudeDeg) > 100) {
+      if (
+        Math.sign(longitudeDeg) !== Math.sign(points[i - 1][0]) &&
+        Math.abs(longitudeDeg) > 100
+      ) {
         if (sign === -1) {
           points_final = points.reverse();
           console.dir(points_final);
@@ -137,7 +137,7 @@ class Satellite {
 
     console.dir(points_final);
     return points_final;
-  }
+  };
 
   public filter = (filters: FilterType) => {
     const entries = Object.entries(filters);
@@ -153,9 +153,10 @@ class Satellite {
       for (let j = 0; j < entries.length; j++) {
         const filter_key = entries[j][0];
         const filter_val = entries[j][1];
-        const isValid = (filter_key === 'id') 
-          ? filter_val.includes(sat[filter_key])
-          : filter_val.includes(sat_data[filter_key])
+        const isValid =
+          filter_key === "id"
+            ? filter_val.includes(sat[filter_key])
+            : filter_val.includes(sat_data[filter_key]);
         selected = selected && isValid;
       }
 
@@ -174,7 +175,7 @@ class Satellite {
       // Compute information of the satellites given the current time
       const satrec = twoline2satrec(
         sats_data[i]["LINE1"],
-        sats_data[i]["LINE2"],
+        sats_data[i]["LINE2"]
       );
       const positionAndVelocity = propagate(satrec, this.date);
       const positionEci = positionAndVelocity.position;
@@ -198,7 +199,10 @@ class Satellite {
           (this.metadata as any)[field].push(val);
         }
       };
-      addUnique("Country/Organization of UN Registry", sat["Country/Organization of UN Registry"]);
+      addUnique(
+        "Country/Organization of UN Registry",
+        sat["Country/Organization of UN Registry"]
+      );
       addUnique("Operator/Owner", sat["Operator/Owner"]);
       addUnique("Users", sat["Users"]);
       addUnique("Purpose", sat["Purpose"]);
@@ -215,14 +219,12 @@ class Satellite {
       // Fetch data
       var sats_data = await (await fetch("web_data.json")).json();
       // Sort by name
-      sats_data = sats_data.sort((
-        a: any,
-        b: any,
-      ) => ((a["Official Name of Satellite"] < b["Official Name of Satellite"])
-        ? -1
-        : ((a["Official Name of Satellite"] > b["Official Name of Satellite"])
-          ? 1
-          : 0))
+      sats_data = sats_data.sort((a: any, b: any) =>
+        a["Official Name of Satellite"] < b["Official Name of Satellite"]
+          ? -1
+          : a["Official Name of Satellite"] > b["Official Name of Satellite"]
+            ? 1
+            : 0
       );
 
       this.satelliteData = sats_data;
