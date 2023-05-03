@@ -8,13 +8,8 @@ import {
   propagate,
   twoline2satrec,
 } from "satellite.js";
-import { useState } from "react";
 import "moment";
 import moment from "moment";
-
-// function randomInt(max: number) {
-//   return Math.ceil(Math.random() * max) * (Math.round(Math.random()) ? 1 : -1);
-// }
 
 class Satellite {
   private setSatellites: React.Dispatch<React.SetStateAction<SatelliteType[]>>;

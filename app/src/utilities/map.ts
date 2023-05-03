@@ -3,14 +3,13 @@ import Graphic from "@arcgis/core/Graphic";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import Point from "@arcgis/core/geometry/Point";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
-import Basemap from "@arcgis/core/Basemap.js";
 import Map from "@arcgis/core/Map";
 import React from "react";
 import { SatelliteType } from "../types";
 import { Satellite } from "./satellite";
 import { Satellite as satelliteIcon } from "../images";
 
-const getTextSymbol = (name: string) => {
+const getTextSymbol = () => {
   const symbol = new SimpleMarkerSymbol();
   symbol.set("path", satelliteIcon);
   symbol.set("outline", null);
@@ -55,6 +54,7 @@ class MapManager {
         const selectedGraphic = response.results[0];
         if (selectedGraphic != undefined && !selectedGraphic.type) return;
         if (selectedGraphic.type != "graphic") return;
+        // Callback
         onClick(selectedGraphic.graphic, tempThis);
       });
     });
@@ -69,13 +69,12 @@ class MapManager {
   };
 
   drawPoint = (satellite: SatelliteType) => {
-    // console.log("drawing: ", satellite);
     const p = new Point({
       longitude: satellite.longitude,
       latitude: satellite.latitude,
     });
     const g = new Graphic({
-      symbol: getTextSymbol("satellite_alt"),
+      symbol: getTextSymbol(),
       geometry: p,
       attributes: {
         satellite_id: satellite.id,

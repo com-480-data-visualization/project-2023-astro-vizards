@@ -1,7 +1,6 @@
 import { Menu, MenuProps } from "antd";
-import { Content, Header as AntHeader } from "antd/es/layout/layout";
-import MenuItem from "antd/es/menu/MenuItem";
-import { Link, useNavigate } from "react-router-dom";
+import { Header as AntHeader } from "antd/es/layout/layout";
+import { useNavigate } from "react-router-dom";
 import { BookOutlined, RocketOutlined } from "@ant-design/icons";
 import { MenuInfo } from "rc-menu/lib/interface";
 

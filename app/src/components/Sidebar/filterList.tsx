@@ -1,4 +1,4 @@
-import { Menu, Space, theme } from "antd";
+import { Menu, theme } from "antd";
 import Sider from "antd/es/layout/Sider";
 import { CloseCircleOutlined } from "@ant-design/icons";
 import React, { useEffect } from "react";
