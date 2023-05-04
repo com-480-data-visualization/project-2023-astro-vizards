@@ -28,25 +28,25 @@ function Home() {
       new MapManager(setFocusedSatellite, (selectedGraphic, _this) => {
         const satId = selectedGraphic.attributes.satellite_id;
         _this.setFocusedSat(satId);
-        _this.getView().goTo(_this.getCurrentPoints()[satId]);
-        _this.getView().set("zoom", 5);
+        _this.getView().goTo(_this.getCurrentPoints()[satId].graphic);
+        _this.getView().set("zoom", 10);
         _this.drawOrbit(
-          satelliteManager.getSatellites()[satId],
+          _this.getCurrentPoints()[satId].satellite,
           satelliteManager
         );
       }),
     []
   );
   const satelliteManager = useMemo(() => {
-    const satMan = new Satellite(setSatellites, setMetadata);
+    const satMan = new Satellite(setSatellites, setMetadata, (satellites) => mapManager.drawInitialPoints(satellites));
     return satMan;
-  }, []);
+  }, [mapManager]);
 
   const [filters, setFilters] = useState<FilterType>({});
 
   useEffect(() => {
     mapManager.clearAllPoints();
-    mapManager.drawMultiplePoints(satellites, satelliteManager);
+    mapManager.showPoints(satellites);
   }, [satellites]);
 
   const onCloseDrawer = (e: any) => {

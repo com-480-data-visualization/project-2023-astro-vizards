@@ -8,19 +8,22 @@ import React from "react";
 import { SatelliteType } from "../types";
 import { Satellite } from "./satellite";
 import { Satellite as satelliteIcon } from "../images";
+import { Collection } from "typescript";
 
 const getTextSymbol = () => {
   const symbol = new SimpleMarkerSymbol();
   symbol.set("path", satelliteIcon);
   symbol.set("outline", null);
-  symbol.set("color", "white");
-  symbol.set("size", 10);
+  symbol.set("color", "red");
+  symbol.set("size", 12);
   return symbol;
 };
 
 class MapManager {
   private view: SceneView;
-  private current_points: Record<number, Graphic>;
+  private current_points: Record<number, {"graphic": Graphic, "satellite": SatelliteType}>;
+  private graphicsLayers: GraphicsLayer[];
+  private current_orbits: Record<number, Graphic>;
   public setFocusedSat: React.Dispatch<React.SetStateAction<number>>;
   constructor(
     setFocusedSattelite: React.Dispatch<React.SetStateAction<number>>,
@@ -29,6 +32,8 @@ class MapManager {
     /**
      * Initialize application
      */
+    this.graphicsLayers = [new GraphicsLayer(), new GraphicsLayer()];
+    this.current_orbits = [];
     this.setFocusedSat = setFocusedSattelite;
     console.log("Constructing map.");
     this.current_points = [];
@@ -39,16 +44,15 @@ class MapManager {
       container: undefined,
       map: map,
     });
-
-    const graphicsLayer = new GraphicsLayer();
-    this.view.map.add(graphicsLayer);
+    for (const layer of this.graphicsLayers) {
+      this.view.map.add(layer);
+    }
     const tempThis = this;
     this.view.on("click", function(event) {
       var screenPoint = {
         x: event.x,
         y: event.y,
       };
-      console.log("Current_Points: ", tempThis.current_points);
       // Search for graphics at the clicked location
       tempThis.view.hitTest(screenPoint).then((response) => {
         if (response.results.length < 1) return;
@@ -65,24 +69,35 @@ class MapManager {
   };
 
   clearAllPoints = () => {
+    console.log("Clearing all points.");
     this.view.graphics.removeAll();
-    this.current_points = [];
+    for (const layer of this.graphicsLayers) {
+      for(let i = 0; i < layer.graphics.length; i++) {
+        layer.graphics.getItemAt(i).visible = false;
+      }
+    }
   };
-
-  drawPoint = (satellite: SatelliteType) => {
-    const p = new Point({
-      longitude: satellite.longitude,
-      latitude: satellite.latitude,
-    });
-    const g = new Graphic({
-      symbol: getTextSymbol(),
-      geometry: p,
-      attributes: {
-        satellite_id: satellite.id,
-      },
-    });
-    this.view.graphics.add(g);
-    this.current_points[satellite.id] = g;
+  
+  drawInitialPoints = (satellites: SatelliteType[]) => {
+    for(let i = 0; i < satellites.length; i++) {
+      const satellite = satellites[i];
+      const p = new Point({
+        longitude: satellite.longitude,
+        latitude: satellite.latitude,
+      });
+      const g = new Graphic({
+        symbol: getTextSymbol(),
+        geometry: p,
+        attributes: {
+          satellite_id: satellite.id,
+        },
+      });
+      this.graphicsLayers[Math.floor(i/600)].add(g);
+      this.current_points[satellite.id] = {
+        "graphic": g,
+        "satellite": satellite
+      };
+    }
   };
 
   drawOrbit = (satellite: SatelliteType, satelliteManager: Satellite) => {
@@ -114,24 +129,17 @@ class MapManager {
     this.view.graphics.add(g);
   };
 
-  drawMultiplePoints = (
+  showPoints = (
     satellites: SatelliteType[],
-    satelliteManager: Satellite
   ) => {
     // Draw satellites
     if (satellites.length === 0) return;
 
-    // Draw orbit if we have a few satellites
-    if (satellites.length < 10) {
-      satellites.forEach((sat) => {
-        this.drawOrbit(sat, satelliteManager);
-      });
+    for(let i = 0; i < satellites.length; i++) {
+      if(this.current_points[satellites[i].id] !== undefined) {
+        this.current_points[satellites[i].id].graphic.visible = true;
+      }
     }
-
-    satellites.forEach((sat) => {
-      this.drawPoint(sat);
-    });
-
     // Zoom in case of having selected one satellite
     if (satellites.length === 1) {
       this.view.goTo(this.current_points[satellites[0].id]);

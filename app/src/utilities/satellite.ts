@@ -18,10 +18,12 @@ class Satellite {
   private satelliteData: any[];
   private metadata: SatelliteMetadata;
   private date: Date;
+  private callBack: (sattelites: SatelliteType[]) => void;
 
   constructor(
     setSats: React.Dispatch<React.SetStateAction<SatelliteType[]>>,
-    setMetadata: React.Dispatch<React.SetStateAction<SatelliteMetadata>>
+    setMetadata: React.Dispatch<React.SetStateAction<SatelliteMetadata>>,
+    callBack: (sattelites: SatelliteType[]) => void
   ) {
     this.setSatellites = setSats;
     this.setMetadata = setMetadata;
@@ -29,6 +31,7 @@ class Satellite {
     this.satelliteData = [];
     this.metadata = Satellite.getEmptyMetadata();
     this.date = new Date();
+    this.callBack = callBack;
 
     this.initSatellites();
   }
@@ -212,6 +215,7 @@ class Satellite {
     this.allSattelites = sats;
     this.setMetadata(this.metadata);
     this.setSatellites(sats);
+    this.callBack(sats);
   };
 
   private initSatellites = () => {
@@ -228,7 +232,7 @@ class Satellite {
       );
 
       const truncated_sat_data: any[] = [];
-      for (let i = 0; i < 615; i++) {
+      for (let i = 0; i < 933; i++) {
         truncated_sat_data.push(sats_data[i]);
       }
 
