@@ -35,8 +35,15 @@ export function SatelliteList({
   };
 
   const onSelect = (selected: any, info: any) => {
-    setFocusedSatellite(selected[0]);
     const filter_new = filters;
+    if (selected.length == 0) {
+      setFocusedSatellite(-1);
+      delete filter_new["id"];
+      setFilters(filter_new);
+      satelliteManager.filter(filter_new);
+      return;
+    }
+    setFocusedSatellite(selected[0]);
     filter_new["id"] = [selected[0]];
     setFilters(filter_new);
     satelliteManager.filter(filter_new);

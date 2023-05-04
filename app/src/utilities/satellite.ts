@@ -227,7 +227,12 @@ class Satellite {
             : 0
       );
 
-      this.satelliteData = sats_data;
+      const truncated_sat_data: any[] = [];
+      for (let i = 0; i < 615; i++) {
+        truncated_sat_data.push(sats_data[i]);
+      }
+
+      this.satelliteData = truncated_sat_data;
 
       this.updateLocation();
     };

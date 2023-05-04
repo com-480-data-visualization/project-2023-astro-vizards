@@ -1,4 +1,4 @@
-import { Menu, theme } from "antd";
+import { Menu, MenuItemProps, theme } from "antd";
 import Sider from "antd/es/layout/Sider";
 import { CloseCircleOutlined } from "@ant-design/icons";
 import React, { useEffect } from "react";
@@ -7,6 +7,8 @@ import { Satellite } from "../../utilities";
 import Search from "antd/es/input/Search";
 import { RightCircleOutlined, LeftCircleOutlined } from "@ant-design/icons";
 import "./filter-list.scss";
+import { MenuProps } from "rc-menu";
+import { MenuItemType } from "antd/es/menu/hooks/useItems";
 
 interface SidebarProps {
   metadata: SatelliteMetadata;
@@ -27,7 +29,7 @@ export function FilterList({
   const [entries, setEntries] = React.useState(Object.entries(metadata));
   const [searchVal, setSearchVal] = React.useState("");
   const [collapsed, setCollapsed] = React.useState(true);
-
+  const [selectedKeys, setSelectedKeys] = React.useState<Array<string>>([]);
   useEffect(() => {
     console.log("Filtering...");
     const temp: [string, string[]][] = Object.entries(metadata).map((entry) => {
@@ -51,45 +53,36 @@ export function FilterList({
         const name = entry[0];
         const data = entry[1];
 
-        let children: any[] = [];
+        let children: MenuItemType[] = [];
         for (let j = 0; j < data.length; j++) {
           if (!(name in filters) || filters[name].includes(data[j])) {
             children.push({
               key: `${name}-${data[j]}`,
               label: `${data[j]}`,
-              icon: undefined,
               onClick: () => {
                 const filter_new = filters;
-                filter_new[name] = [data[j]];
+                if (
+                  filter_new[name] !== undefined &&
+                  filter_new[name][0] == data[j]
+                ) {
+                  delete filter_new[name];
+                  setSelectedKeys([]);
+                } else {
+                  filter_new[name] = [data[j]];
+                  setSelectedKeys([`${name}-${data[j]}`]);
+                }
                 setFilters(filter_new);
                 satelliteManager.filter(filter_new);
               },
             });
           }
         }
-
-        if (name in filters) {
-          children = children.concat([
-            {
-              key: "filtered",
-              label: "Remove Filter",
-              icon: React.createElement(CloseCircleOutlined),
-              onClick: () => {
-                const filter_new = filters;
-                delete filter_new[name];
-                setFilters(filter_new);
-                satelliteManager.filter(filter_new);
-              },
-            },
-          ]);
-        }
-
         return {
           key: `${name}-${index}`,
           icon: "",
           label: `${name}`,
           children: children,
-        };
+        } as MenuItemType;
       }),
     [entries]
   );
@@ -135,6 +128,7 @@ export function FilterList({
         // defaultOpenKeys={["sub1"]}
         style={{ height: "100%", borderRight: 0 }}
         items={items}
+        selectedKeys={selectedKeys}
       />
     </Sider>
   );

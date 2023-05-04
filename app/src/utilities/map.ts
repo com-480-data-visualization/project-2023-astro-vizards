@@ -14,7 +14,7 @@ const getTextSymbol = () => {
   symbol.set("path", satelliteIcon);
   symbol.set("outline", null);
   symbol.set("color", "white");
-  symbol.set("size", 12);
+  symbol.set("size", 10);
   return symbol;
 };
 
@@ -48,6 +48,7 @@ class MapManager {
         x: event.x,
         y: event.y,
       };
+      console.log("Current_Points: ", tempThis.current_points);
       // Search for graphics at the clicked location
       tempThis.view.hitTest(screenPoint).then((response) => {
         if (response.results.length < 1) return;
@@ -134,9 +135,9 @@ class MapManager {
     // Zoom in case of having selected one satellite
     if (satellites.length === 1) {
       this.view.goTo(this.current_points[satellites[0].id]);
-      this.view.set("zoom", 3);
+      this.view.set("zoom", 4);
     } else {
-      this.view.set("zoom", 1);
+      this.view.set("zoom", 2);
     }
   };
 
