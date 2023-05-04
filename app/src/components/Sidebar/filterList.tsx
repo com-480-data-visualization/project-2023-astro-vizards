@@ -63,7 +63,7 @@ export function FilterList({
                 const filter_new = filters;
                 if (
                   filter_new[name] !== undefined &&
-                  filter_new[name][0] == data[j]
+                  filter_new[name][0] === data[j]
                 ) {
                   delete filter_new[name];
                   setSelectedKeys([]);

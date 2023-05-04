@@ -36,7 +36,7 @@ export function SatelliteList({
 
   const onSelect = (selected: any, info: any) => {
     const filter_new = filters;
-    if (selected.length == 0) {
+    if (selected.length === 0) {
       setFocusedSatellite(-1);
       delete filter_new["id"];
       setFilters(filter_new);
