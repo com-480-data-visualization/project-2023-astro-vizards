@@ -53,8 +53,8 @@ class MapManager {
       tempThis.view.hitTest(screenPoint).then((response) => {
         if (response.results.length < 1) return;
         const selectedGraphic = response.results[0];
-        if (selectedGraphic != undefined && !selectedGraphic.type) return;
-        if (selectedGraphic.type != "graphic") return;
+        if (selectedGraphic !== undefined && !selectedGraphic.type) return;
+        if (selectedGraphic.type !== "graphic") return;
         // Callback
         onClick(selectedGraphic.graphic, tempThis);
       });
