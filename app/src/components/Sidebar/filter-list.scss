@@ -2,6 +2,9 @@
   position: relative;
   overflow: visible !important;
 
+  & > div {
+    overflow: auto !important;
+  }
   &__icon {
     position: absolute;
     bottom: 50%;
