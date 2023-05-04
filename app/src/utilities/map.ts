@@ -79,6 +79,7 @@ class MapManager {
   };
   
   drawInitialPoints = (satellites: SatelliteType[]) => {
+    console.log("Drwaing init points, ",satellites)
     for(let i = 0; i < satellites.length; i++) {
       const satellite = satellites[i];
       const p = new Point({
@@ -142,7 +143,8 @@ class MapManager {
     }
     // Zoom in case of having selected one satellite
     if (satellites.length === 1) {
-      this.view.goTo(this.current_points[satellites[0].id]);
+      console.log("Zooming in", satellites[0].id, this.current_points[satellites[0].id])
+      this.view.goTo(this.current_points[satellites[0].id].graphic);
       this.view.set("zoom", 4);
     } else {
       this.view.set("zoom", 2);
