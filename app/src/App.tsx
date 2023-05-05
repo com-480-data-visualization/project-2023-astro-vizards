@@ -32,13 +32,15 @@ function Home() {
         _this.getView().set("zoom", 10);
         _this.drawOrbit(
           _this.getCurrentPoints()[satId].satellite,
-          satelliteManager,
-        )
+          satelliteManager
+        );
       }),
     []
   );
   const satelliteManager = useMemo(() => {
-    const satMan = new Satellite(setSatellites, setMetadata, (satellites) => mapManager.drawInitialPoints(satellites));
+    const satMan = new Satellite(setSatellites, setMetadata, (satellites) =>
+      mapManager.drawInitialPoints(satellites)
+    );
     return satMan;
   }, [mapManager]);
 

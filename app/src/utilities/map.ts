@@ -9,11 +9,13 @@ import { SatelliteType } from "../types";
 import { Satellite } from "./satellite";
 import { Satellite as satelliteIcon } from "../images";
 import { Collection } from "typescript";
+import MapView from "@arcgis/core/views/MapView";
 
-const getTextSymbol = () => {
+const getTextSymbol = (id: number) => {
   const symbol = new SimpleMarkerSymbol();
   symbol.set("path", satelliteIcon);
   symbol.set("outline", null);
+  symbol.set("id", id);
   symbol.set("color", "red");
   symbol.set("size", 12);
   return symbol;
@@ -21,7 +23,10 @@ const getTextSymbol = () => {
 
 class MapManager {
   private view: SceneView;
-  private current_points: Record<number, {"graphic": Graphic, "satellite": SatelliteType}>;
+  private current_points: Record<
+    number,
+    { graphic: Graphic; satellite: SatelliteType }
+  >;
   private graphicsLayers: GraphicsLayer[];
   private current_orbits: Record<number, Graphic>;
   public setFocusedSat: React.Dispatch<React.SetStateAction<number>>;
@@ -32,7 +37,7 @@ class MapManager {
     /**
      * Initialize application
      */
-    this.graphicsLayers = [new GraphicsLayer(), new GraphicsLayer()];
+    this.graphicsLayers = [new GraphicsLayer()];
     this.current_orbits = [];
     this.setFocusedSat = setFocusedSattelite;
     console.log("Constructing map.");
@@ -40,7 +45,7 @@ class MapManager {
     const map = new Map({
       basemap: "hybrid",
     });
-    this.view = new SceneView({
+    this.view = new MapView({
       container: undefined,
       map: map,
     });
@@ -53,6 +58,7 @@ class MapManager {
         x: event.x,
         y: event.y,
       };
+      console.log(tempThis.view);
       // Search for graphics at the clicked location
       tempThis.view.hitTest(screenPoint).then((response) => {
         if (response.results.length < 1) return;
@@ -72,31 +78,31 @@ class MapManager {
     console.log("Clearing all points.");
     this.view.graphics.removeAll();
     for (const layer of this.graphicsLayers) {
-      for(let i = 0; i < layer.graphics.length; i++) {
+      for (let i = 0; i < layer.graphics.length; i++) {
         layer.graphics.getItemAt(i).visible = false;
       }
     }
   };
-  
+
   drawInitialPoints = (satellites: SatelliteType[]) => {
-    console.log("Drwaing init points, ",satellites)
-    for(let i = 0; i < satellites.length; i++) {
+    console.log("Drwaing init points, ", satellites);
+    for (let i = 0; i < satellites.length; i++) {
       const satellite = satellites[i];
       const p = new Point({
         longitude: satellite.longitude,
         latitude: satellite.latitude,
       });
       const g = new Graphic({
-        symbol: getTextSymbol(),
+        symbol: getTextSymbol(satellite.id),
         geometry: p,
         attributes: {
           satellite_id: satellite.id,
         },
       });
-      this.graphicsLayers[Math.floor(i/600)].add(g);
+      this.graphicsLayers[0].add(g);
       this.current_points[satellite.id] = {
-        "graphic": g,
-        "satellite": satellite
+        graphic: g,
+        satellite: satellite,
       };
     }
   };
@@ -130,20 +136,22 @@ class MapManager {
     this.view.graphics.add(g);
   };
 
-  showPoints = (
-    satellites: SatelliteType[],
-  ) => {
+  showPoints = (satellites: SatelliteType[]) => {
     // Draw satellites
     if (satellites.length === 0) return;
 
-    for(let i = 0; i < satellites.length; i++) {
-      if(this.current_points[satellites[i].id] !== undefined) {
+    for (let i = 0; i < satellites.length; i++) {
+      if (this.current_points[satellites[i].id] !== undefined) {
         this.current_points[satellites[i].id].graphic.visible = true;
       }
     }
     // Zoom in case of having selected one satellite
     if (satellites.length === 1) {
-      console.log("Zooming in", satellites[0].id, this.current_points[satellites[0].id])
+      console.log(
+        "Zooming in",
+        satellites[0].id,
+        this.current_points[satellites[0].id]
+      );
       this.view.goTo(this.current_points[satellites[0].id].graphic);
       this.view.set("zoom", 4);
     } else {

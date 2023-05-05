@@ -232,7 +232,11 @@ class Satellite {
       );
 
       const truncated_sat_data: any[] = [];
-      for (let i = 0; i < 933; i++) {
+      for (let i = 0; i < sats_data.length; i++) {
+        if (i == 617) {
+          console.log("Problematic data?: ", sats_data[i]);
+          continue;
+        }
         truncated_sat_data.push(sats_data[i]);
       }
 
