@@ -19,6 +19,7 @@
 **10% of the final grade**
 
 > Report can be found [here](reports/milestone2/report.pdf)
+
 > Website can be found [here](https://com-480-data-visualization.github.io/project-2023-astro-vizards/)
 
 ## Milestone 3 (4th June, 5pm)
