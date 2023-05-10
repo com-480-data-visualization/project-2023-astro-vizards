@@ -31,7 +31,6 @@ export function FilterList({
   const [collapsed, setCollapsed] = React.useState(true);
   const [selectedKeys, setSelectedKeys] = React.useState<Array<string>>([]);
   useEffect(() => {
-    console.log("Filtering...");
     const temp: [string, string[]][] = Object.entries(metadata).map((entry) => {
       return [
         entry[0],

@@ -10,6 +10,7 @@ import { AboutUs } from "./routes/AboutUs/AboutUs";
 import { MapManager, Satellite } from "./utilities";
 import { FilterType, SatelliteMetadata, SatelliteType } from "./types";
 import { FilterList } from "./components/Sidebar/filterList";
+import { ThreeDView } from "./routes/ThreeDView/ThreeDView";
 
 function Home() {
   useEffect(() => {
@@ -25,11 +26,16 @@ function Home() {
 
   const mapManager = useMemo(
     () =>
-      new MapManager(setFocusedSatellite, (selectedGraphic, _this) => {
+      new MapManager(setFocusedSatellite, (selectedGraphic, _this, threed) => {
         const satId = selectedGraphic.attributes.satellite_id;
         _this.setFocusedSat(satId);
-        _this.getView().goTo(_this.getCurrentPoints()[satId].graphic);
-        _this.getView().set("zoom", 10);
+        const view = threed ? _this.get3DView() : _this.getView();
+        view.goTo({
+          target: selectedGraphic.geometry,
+          zoom: 4,
+          heading: 0,
+          tilt: 60,
+        })
         _this.drawOrbit(
           _this.getCurrentPoints()[satId].satellite,
           satelliteManager
@@ -48,7 +54,7 @@ function Home() {
 
   useEffect(() => {
     mapManager.clearAllPoints();
-    mapManager.showPoints(satellites);
+    mapManager.showPoints(satellites, satelliteManager);
   }, [satellites]);
 
   const onCloseDrawer = (e: any) => {
@@ -73,6 +79,7 @@ function Home() {
           <Routes>
             <Route path="/" element={<MapPage mapManager={mapManager} />} />
             <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/three-d-view" element={<ThreeDView mapManager={mapManager}/>} />
           </Routes>
         </Layout>
         <SatelliteList

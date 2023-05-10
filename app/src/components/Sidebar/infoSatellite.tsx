@@ -7,7 +7,6 @@ interface SidebarProps {
 }
 
 export function InfoSatellite({ data }: SidebarProps) {
-    console.dir(data)
     if (data == null) {
         return <div></div>;
     }

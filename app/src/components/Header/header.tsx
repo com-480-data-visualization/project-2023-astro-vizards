@@ -15,6 +15,11 @@ const items: MenuProps["items"] = [
     key: "about-us",
     label: "About Us",
   },
+  {
+    icon: <RocketOutlined />,
+    key: "three-d-view",
+    label: "3D View",
+  }
 ];
 
 export function Header() {

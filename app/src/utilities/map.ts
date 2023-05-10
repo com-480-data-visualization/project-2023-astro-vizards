@@ -1,43 +1,85 @@
-import SceneView from "@arcgis/core/views/MapView";
+import SceneView from "@arcgis/core/views/SceneView";
 import Graphic from "@arcgis/core/Graphic";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import Point from "@arcgis/core/geometry/Point";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import PointSymbol3D from "@arcgis/core/symbols/PointSymbol3D";
 import Map from "@arcgis/core/Map";
 import React from "react";
 import { SatelliteType } from "../types";
 import { Satellite } from "./satellite";
 import { Satellite as satelliteIcon } from "../images";
-import { Collection } from "typescript";
 import MapView from "@arcgis/core/views/MapView";
+import SatelliteSvg from "../images/icons/satellite.svg"
 
-const getTextSymbol = (id: number) => {
-  const symbol = new SimpleMarkerSymbol();
-  symbol.set("path", satelliteIcon);
-  symbol.set("outline", null);
+const getTextSymbol: (id: number, threed:boolean) => (SimpleMarkerSymbol | PointSymbol3D) 
+= (id, threed) => {
+  if(threed === false) {
+    const symbol = new SimpleMarkerSymbol();
+    symbol.set("path", satelliteIcon)
+    symbol.set("id", id);
+    symbol.set("color", "red");
+    symbol.set("outline", {
+      color: "black",
+      width: 0.5,
+    });
+    symbol.set("size", 12);
+    return symbol;
+  }
+  const symbol = new PointSymbol3D();
   symbol.set("id", id);
-  symbol.set("color", "red");
-  symbol.set("size", 12);
+  symbol.set("symbolLayers", [
+    {
+      type: "icon",
+      size: 16,
+      resource: { href: SatelliteSvg },
+      material: { color: "red" },
+      outline: { color: "red", size: "4px" }
+    }
+  ]);
   return symbol;
 };
 
+const returnClickHandler = (
+  onClick: (selectedGraphic: Graphic, _this: MapManager, threed: boolean) => void,
+  tempThis: MapManager,
+  threed: boolean = false,
+) => function(event:__esri.ViewClickEvent) {
+  var screenPoint = {
+    x: event.x,
+    y: event.y,
+  };
+  // Search for graphics at the clicked location
+  const view = threed ? tempThis.get3DView() : tempThis.getView();
+  view.hitTest(screenPoint).then((response) => {
+    console.log("Hit test response: ", response)
+    if (response.results.length < 1) return;
+    const selectedGraphic = response.results[0];
+    if (selectedGraphic !== undefined && !selectedGraphic.type) return;
+    if (selectedGraphic.type !== "graphic") return;
+    // Callback
+    onClick(selectedGraphic.graphic, tempThis, threed);
+  });
+};
+
 class MapManager {
-  private view: SceneView;
+  private view: MapView;
+  private threeDView: SceneView;
   private current_points: Record<
     number,
-    { graphic: Graphic; satellite: SatelliteType }
+    { graphic: Graphic[]; satellite: SatelliteType }
   >;
   private graphicsLayers: GraphicsLayer[];
   private current_orbits: Record<number, Graphic>;
   public setFocusedSat: React.Dispatch<React.SetStateAction<number>>;
   constructor(
     setFocusedSattelite: React.Dispatch<React.SetStateAction<number>>,
-    onClick: (selectedGraphic: Graphic, _this: MapManager) => void
+    onClick: (selectedGraphic: Graphic, _this: MapManager, threed: boolean) => void
   ) {
     /**
      * Initialize application
      */
-    this.graphicsLayers = [new GraphicsLayer()];
+    this.graphicsLayers = [new GraphicsLayer(), new GraphicsLayer()];
     this.current_orbits = [];
     this.setFocusedSat = setFocusedSattelite;
     console.log("Constructing map.");
@@ -49,34 +91,30 @@ class MapManager {
       container: undefined,
       map: map,
     });
-    for (const layer of this.graphicsLayers) {
-      this.view.map.add(layer);
-    }
-    const tempThis = this;
-    this.view.on("click", function(event) {
-      var screenPoint = {
-        x: event.x,
-        y: event.y,
-      };
-      console.log(tempThis.view);
-      // Search for graphics at the clicked location
-      tempThis.view.hitTest(screenPoint).then((response) => {
-        if (response.results.length < 1) return;
-        const selectedGraphic = response.results[0];
-        if (selectedGraphic !== undefined && !selectedGraphic.type) return;
-        if (selectedGraphic.type !== "graphic") return;
-        // Callback
-        onClick(selectedGraphic.graphic, tempThis);
-      });
+    this.threeDView = new SceneView({
+      container: undefined,
+      viewingMode: "global",
+      map: new Map({
+        basemap: "hybrid",
+      }),
     });
+    this.view.map.add(this.graphicsLayers[0]);
+    this.threeDView.map.add(this.graphicsLayers[1]);
+    const tempThis = this;
+    this.view.on("click", returnClickHandler(onClick, tempThis));
+    this.threeDView.on("click", returnClickHandler(onClick, tempThis, true));
   }
   attachToContainer = (ref: React.RefObject<HTMLDivElement>) => {
     this.view.set("container", ref.current);
   };
 
+  attach3DToContainer = (ref: React.RefObject<HTMLDivElement>) => {
+    this.threeDView.set("container", ref.current);
+  };
+
   clearAllPoints = () => {
-    console.log("Clearing all points.");
     this.view.graphics.removeAll();
+    this.threeDView.graphics.removeAll();
     for (const layer of this.graphicsLayers) {
       for (let i = 0; i < layer.graphics.length; i++) {
         layer.graphics.getItemAt(i).visible = false;
@@ -85,7 +123,6 @@ class MapManager {
   };
 
   drawInitialPoints = (satellites: SatelliteType[]) => {
-    console.log("Drwaing init points, ", satellites);
     for (let i = 0; i < satellites.length; i++) {
       const satellite = satellites[i];
       const p = new Point({
@@ -93,15 +130,23 @@ class MapManager {
         latitude: satellite.latitude,
       });
       const g = new Graphic({
-        symbol: getTextSymbol(satellite.id),
+        symbol: getTextSymbol(satellite.id,false),
+        geometry: p,
+        attributes: {
+          satellite_id: satellite.id,
+        },
+      });
+      const g2 = new Graphic({
+        symbol: getTextSymbol(satellite.id,true),
         geometry: p,
         attributes: {
           satellite_id: satellite.id,
         },
       });
       this.graphicsLayers[0].add(g);
+      this.graphicsLayers[1].add(g2);
       this.current_points[satellite.id] = {
-        graphic: g,
+        graphic: [g, g2],
         satellite: satellite,
       };
     }
@@ -133,17 +178,31 @@ class MapManager {
       symbol: polylineSymbol,
       attributes: polylineAtt,
     });
+    let g2 = new Graphic({
+      geometry: polyline,
+      symbol: polylineSymbol,
+      attributes: polylineAtt,
+    });
+
+    this.threeDView.graphics.add(g2);
     this.view.graphics.add(g);
   };
 
-  showPoints = (satellites: SatelliteType[]) => {
+  showPoints = (satellites: SatelliteType[], satelliteManager: Satellite) => {
     // Draw satellites
     if (satellites.length === 0) return;
 
     for (let i = 0; i < satellites.length; i++) {
       if (this.current_points[satellites[i].id] !== undefined) {
-        this.current_points[satellites[i].id].graphic.visible = true;
+        this.current_points[satellites[i].id].graphic[0].visible = true;
+        this.current_points[satellites[i].id].graphic[1].visible = true;
       }
+    }
+    if (satellites.length < 3) {
+      // Draw orbits for satellites
+      satellites.forEach((satellite) => {
+        this.drawOrbit(satellite, satelliteManager);
+      });
     }
     // Zoom in case of having selected one satellite
     if (satellites.length === 1) {
@@ -152,14 +211,40 @@ class MapManager {
         satellites[0].id,
         this.current_points[satellites[0].id]
       );
-      this.view.goTo(this.current_points[satellites[0].id].graphic);
-      this.view.set("zoom", 4);
+      this.view.goTo({
+        target: this.current_points[satellites[0].id].graphic[0],
+        zoom: 4,
+        heading: 0,
+        tilt: 60,
+      });
+      console.log("Trying to zoom into", this.current_points[satellites[0].id].graphic[1])
+      this.threeDView.goTo({
+        target: this.current_points[satellites[0].id].graphic[1],
+        zoom: 4,
+        heading: 0,
+        tilt: 60,
+      })
     } else {
-      this.view.set("zoom", 2);
+      this.view.goTo({
+        // Center the view on world center
+        target: [0, 0],
+        zoom: 2,
+        heading: 0,
+        tilt: 0,
+      })
+      this.threeDView.goTo({
+        // Center the view on world center
+        target: [0, 0],
+        zoom: 2,
+        heading: 0,
+        tilt: 0,
+      })
     }
   };
 
   getView = () => this.view;
+
+  get3DView = () => this.threeDView;
 
   getCurrentPoints = () => this.current_points;
 }

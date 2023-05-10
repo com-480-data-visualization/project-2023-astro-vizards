@@ -61,8 +61,6 @@ class Satellite {
 
     const halfPeriod = period / 2.0;
 
-    console.log("Period " + period);
-
     // Compute sampling points
     // const N = 30;
     // const FACTOR = 0.925;
@@ -94,7 +92,6 @@ class Satellite {
 
       if (i === 0) {
         points.push([longitudeDeg, latitudeDeg]);
-        console.dir([longitudeDeg, latitudeDeg]);
         i += 1;
         continue;
       }
@@ -110,13 +107,10 @@ class Satellite {
       ) {
         if (sign === -1) {
           points_final = points.reverse();
-          console.dir(points_final);
           i = 0;
           sign = 1;
           points = [];
         } else {
-          console.log("Points right");
-          console.dir(points);
           points_final = points_final.concat(points.slice(1));
           break;
         }
@@ -137,8 +131,6 @@ class Satellite {
     //   const latitudeDeg = degreesLat(positionGd.latitude);
     //   points.push([longitudeDeg, latitudeDeg]);
     // }
-
-    console.dir(points_final);
     return points_final;
   };
 
@@ -151,7 +143,6 @@ class Satellite {
         sat.selected = true;
         continue;
       }
-
       var selected = true;
       for (let j = 0; j < entries.length; j++) {
         const filter_key = entries[j][0];
@@ -186,7 +177,16 @@ class Satellite {
       const positionGd = eciToGeodetic(positionEci as EciVec3<number>, gmst);
       const longitudeDeg = degreesLong(positionGd.longitude);
       const latitudeDeg = degreesLat(positionGd.latitude);
-
+      if (isNaN(longitudeDeg) || isNaN(latitudeDeg)) {
+        console.log("undefined",{
+        id: i,
+        name: sats_data[i]["Official Name of Satellite"],
+        longitude: longitudeDeg,
+        latitude: latitudeDeg,
+        selected: true,
+        })
+        continue;
+      }
       sats.push({
         id: i,
         name: sats_data[i]["Official Name of Satellite"],
@@ -194,7 +194,6 @@ class Satellite {
         latitude: latitudeDeg,
         selected: true,
       });
-
       const sat = sats_data[i];
       // Save metadata
       const addUnique = (field: string, val: string) => {
@@ -233,10 +232,6 @@ class Satellite {
 
       const truncated_sat_data: any[] = [];
       for (let i = 0; i < sats_data.length; i++) {
-        if (i == 617) {
-          console.log("Problematic data?: ", sats_data[i]);
-          continue;
-        }
         truncated_sat_data.push(sats_data[i]);
       }
 
