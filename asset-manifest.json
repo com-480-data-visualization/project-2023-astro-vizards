@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/project-2023-astro-vizards/static/css/main.2778cb71.css",
-    "main.js": "/project-2023-astro-vizards/static/js/main.d3ea1e5a.js",
+    "main.js": "/project-2023-astro-vizards/static/js/main.056817e9.js",
     "static/js/2564.d338a888.chunk.js": "/project-2023-astro-vizards/static/js/2564.d338a888.chunk.js",
     "static/js/7027.d51773f5.chunk.js": "/project-2023-astro-vizards/static/js/7027.d51773f5.chunk.js",
     "static/js/6816.e2189ee9.chunk.js": "/project-2023-astro-vizards/static/js/6816.e2189ee9.chunk.js",
@@ -327,7 +327,7 @@
     "static/media/SM-Slider_TrackBackground_hover.svg": "/project-2023-astro-vizards/static/media/SM-Slider_TrackBackground_hover.5dcf34ac7d59f98735ad.svg",
     "static/media/SM-Slider_TrackBackground_idle.svg": "/project-2023-astro-vizards/static/media/SM-Slider_TrackBackground_idle.cc7bd7014a003ba1844f.svg",
     "main.2778cb71.css.map": "/project-2023-astro-vizards/static/css/main.2778cb71.css.map",
-    "main.d3ea1e5a.js.map": "/project-2023-astro-vizards/static/js/main.d3ea1e5a.js.map",
+    "main.056817e9.js.map": "/project-2023-astro-vizards/static/js/main.056817e9.js.map",
     "2564.d338a888.chunk.js.map": "/project-2023-astro-vizards/static/js/2564.d338a888.chunk.js.map",
     "7027.d51773f5.chunk.js.map": "/project-2023-astro-vizards/static/js/7027.d51773f5.chunk.js.map",
     "6816.e2189ee9.chunk.js.map": "/project-2023-astro-vizards/static/js/6816.e2189ee9.chunk.js.map",
@@ -571,6 +571,6 @@
   },
   "entrypoints": [
     "static/css/main.2778cb71.css",
-    "static/js/main.d3ea1e5a.js"
+    "static/js/main.056817e9.js"
   ]
 }
