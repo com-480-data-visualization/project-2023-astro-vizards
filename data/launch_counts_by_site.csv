@@ -1,23 +1,21 @@
-,count
-Baikonur Cosmodrome,259
-Guiana Space Center,222
-Cape Canaveral,212
-Vandenberg AFB,138
-Plesetsk Cosmodrome,91
-Satish Dhawan Space Centre,87
-Taiyuan Launch Center,81
-Dombarovsky Air Base,65
-Xichang Satellite Launch Center,61
-Jiuquan Satellite Launch Center,59
-Tanegashima Space Center,33
-Wallops Island Flight Facility,32
-International Space Station,29
-Sea Launch (Odyssey),25
-Kodiak Launch Complex,5
-Sea Launch,4
-Palmachim Launch Complex ,4
-Vostochny Cosmodrome,3
-Svobodny Cosmodrome,3
-Uchinoura Space Center,3
-Kwajalein Island,2
-Naro Space Center,1
+name,latitude,longtitude,count
+Vandenberg AFB,34.77204,-120.60124,138.0
+Cape Canaveral,28.46675,-80.55852,212.0
+Guiana Space Center,5.23739,-52.7695,222.0
+Baikonur Cosmodrome,45.95515,63.35028,259.0
+Wallops Island Flight Facility,37.84621,-75.47938,32.0
+Satish Dhawan Space Centre,13.7374,80.2351,87.0
+Svobodny Cosmodrome,51.83441,128.2757,3.0
+Kodiak Launch Complex,57.43533,-152.33931,5.0
+Plesetsk Cosmodrome,62.925556,40.577778,91.0
+Taiyuan Launch Center,38.849086,111.608497,81.0
+Xichang Satellite Launch Center,28.24646,102.02814,61.0
+Jiuquan Satellite Launch Center,40.96056,100.29833,59.0
+Dombarovsky Air Base,51.20706,59.85003,65.0
+Uchinoura Space Center,31.25186,131.07914,3.0
+Tanegashima Space Center,30.39096,130.96813,33.0
+Kwajalein Island,9.048167,167.743083,2.0
+Vostochny Cosmodrome,51.883,128.333,3.0
+Naro Space Center,34.4417,127.5341,1.0
+Palmachim Launch Complex,31.884444,34.680278,4
+Sea Launch (Odyssey),0.0,154.0,25.0
