@@ -1,0 +1,122 @@
+[
+  {
+    "name": "Vandenberg AFB",
+    "latitude": 34.77204,
+    "longitude": -120.60124,
+    "count": 138
+  },
+  {
+    "name": "Cape Canaveral",
+    "latitude": 28.46675,
+    "longitude": -80.55852,
+    "count": 212
+  },
+  {
+    "name": "Guiana Space Center",
+    "latitude": 5.23739,
+    "longitude": -52.7695,
+    "count": 222
+  },
+  {
+    "name": "Baikonur Cosmodrome",
+    "latitude": 45.95515,
+    "longitude": 63.35028,
+    "count": 259
+  },
+  {
+    "name": "Wallops Island Flight Facility",
+    "latitude": 37.84621,
+    "longitude": -75.47938,
+    "count": 32
+  },
+  {
+    "name": "Satish Dhawan Space Centre",
+    "latitude": 13.7374,
+    "longitude": 80.2351,
+    "count": 87
+  },
+  {
+    "name": "Svobodny Cosmodrome",
+    "latitude": 51.83441,
+    "longitude": 128.2757,
+    "count": 3
+  },
+  {
+    "name": "Kodiak Launch Complex",
+    "latitude": 57.43533,
+    "longitude": -152.33931,
+    "count": 5
+  },
+  {
+    "name": "Plesetsk Cosmodrome",
+    "latitude": 62.925556,
+    "longitude": 40.577778,
+    "count": 91
+  },
+  {
+    "name": "Taiyuan Launch Center",
+    "latitude": 38.849086,
+    "longitude": 111.608497,
+    "count": 81
+  },
+  {
+    "name": "Xichang Satellite Launch Center",
+    "latitude": 28.24646,
+    "longitude": 102.02814,
+    "count": 61
+  },
+  {
+    "name": "Jiuquan Satellite Launch Center",
+    "latitude": 40.96056,
+    "longitude": 100.29833,
+    "count": 59
+  },
+  {
+    "name": "Dombarovsky Air Base",
+    "latitude": 51.20706,
+    "longitude": 59.85003,
+    "count": 65
+  },
+  {
+    "name": "Uchinoura Space Center",
+    "latitude": 31.25186,
+    "longitude": 131.07914,
+    "count": 3
+  },
+  {
+    "name": "Tanegashima Space Center",
+    "latitude": 30.39096,
+    "longitude": 130.96813,
+    "count": 33
+  },
+  {
+    "name": "Kwajalein Island",
+    "latitude": 9.048167,
+    "longitude": 167.743083,
+    "count": 2
+  },
+  {
+    "name": "Vostochny Cosmodrome",
+    "latitude": 51.883,
+    "longitude": 128.333,
+    "count": 3
+  },
+  {
+    "name": "Naro Space Center",
+    "latitude": 34.4417,
+    "longitude": 127.5341,
+    "count": 1
+  },
+  {
+    "name": "Palmachim Launch Complex",
+    "latitude": 31.884444,
+    "longitude": 34.680278,
+    "count": 4
+  },
+  {
+    "name": "Sea Launch (Odyssey)",
+    "latitude": 0,
+    "longitude": 154,
+    "count": 25
+  }
+ ]

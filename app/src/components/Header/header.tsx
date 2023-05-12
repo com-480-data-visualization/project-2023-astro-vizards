@@ -19,6 +19,11 @@ const items: MenuProps["items"] = [
     icon: <RocketOutlined />,
     key: "three-d-view",
     label: "3D View",
+  },
+  {
+    icon: <RocketOutlined />,
+    key: "launch-sites",
+    label: "Launch Sites",
   }
 ];
 

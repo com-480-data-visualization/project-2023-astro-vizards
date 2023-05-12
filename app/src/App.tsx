@@ -7,6 +7,8 @@ import Config from "@arcgis/core/config";
 import { Header, SatelliteList, InfoSatellite } from "./components";
 import { MapPage } from "./routes";
 import { AboutUs } from "./routes/AboutUs/AboutUs";
+import { LaunchSites } from "./routes/plots/LaunchSites/LaunchSites";
+
 import { MapManager, Satellite } from "./utilities";
 import { FilterType, SatelliteMetadata, SatelliteType } from "./types";
 import { FilterList } from "./components/Sidebar/filterList";
@@ -80,6 +82,7 @@ function Home() {
             <Route path="/" element={<MapPage mapManager={mapManager} />} />
             <Route path="/about-us" element={<AboutUs />} />
             <Route path="/three-d-view" element={<ThreeDView mapManager={mapManager}/>} />
+            <Route path="/launch-sites" element={<LaunchSites />} />
           </Routes>
         </Layout>
         <SatelliteList
