@@ -1,7 +1,7 @@
 import { Menu, MenuProps } from "antd";
 import { Header as AntHeader } from "antd/es/layout/layout";
 import { useNavigate } from "react-router-dom";
-import { BookOutlined, RocketOutlined } from "@ant-design/icons";
+import { BookOutlined, RocketOutlined, EnvironmentOutlined } from "@ant-design/icons";
 import { MenuInfo } from "rc-menu/lib/interface";
 
 const items: MenuProps["items"] = [
@@ -21,7 +21,7 @@ const items: MenuProps["items"] = [
     label: "3D View",
   },
   {
-    icon: <RocketOutlined />,
+    icon: <EnvironmentOutlined />,
     key: "launch-sites",
     label: "Launch Sites",
   }
