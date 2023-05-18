@@ -166,7 +166,8 @@ class Satellite {
     const sats: SatelliteType[] = [];
     var gmst = gstime(this.date);
     for (let i = 0; i < sats_data.length; i++) {
-      // Compute information of the satellites given the current time
+      try {
+              // Compute information of the satellites given the current time
       const satrec = twoline2satrec(
         sats_data[i]["LINE1"],
         sats_data[i]["LINE2"]
@@ -209,6 +210,10 @@ class Satellite {
       addUnique("Users", sat["Users"]);
       addUnique("Purpose", sat["Purpose"]);
       addUnique("Contractor", sat["Contractor"]);
+      }
+      catch (e) {
+        console.log("Failed to process satellite", sats_data[i]["Official Name of Satellite"], e)
+      }
     }
 
     this.allSattelites = sats;
