@@ -2,7 +2,7 @@ import ts from "typescript";
 import "./launch-sites.scss";
 import * as Plot from '@observablehq/plot';
 import { useRef, useEffect, useState } from "react";
-import {Slider, Space, Layout, Typography, Row, Col } from 'antd';
+import {Slider, Space, Layout, Typography, Row, Col, Popover } from 'antd';
 import * as d3 from 'd3';
 const { Header, Footer, Content, Sider } = Layout;
 const { Title, Paragraph } = Typography;
@@ -20,7 +20,20 @@ export const LaunchSites = () => {
   const [latInfo, setLatInfo] = useState(" ");
   const [longInfo, setLongInfo] = useState(" ");
   const [countInfo, setCountInfo] = useState(" ");
+  const [popoverVisible, setPopoverVisible] = useState(false);
+  const [popX, setPopX] = useState(0);
+  const [popY, setPopY] = useState(0);
 
+
+
+  const satelliteInfo = (
+    <div className="info"> 
+      <Title level={5} >{satHeader}</Title>
+      <Paragraph>Latitude: {latInfo}</Paragraph>
+      <Paragraph>Longitude: {longInfo}</Paragraph>
+      <Paragraph>Number of Satellites Launched: {countInfo}</Paragraph>
+    </div>
+  );
 
   const fetchData = async () =>{
     const land_json = await fetch ("land.geojson").then(response => response.json());
@@ -48,8 +61,10 @@ export const LaunchSites = () => {
     const earthPlot = Plot.plot({
       projection: {type: "orthographic", rotate: [-longitude, -30]},
       style: "overflow: visible;", // allow dots to escape
+      
       marks: [
-        Plot.geo(land, {fill: "grey", fillOpacity: 0.2}),
+        Plot.frame({fill:"#F5F5F5", stroke: "#F5F5F5"}),
+        Plot.geo(land, {fill: "grey", fillOpacity: 0.7}),
         Plot.sphere(),
         on(Plot.dot(sites, {x: "longitude", y: "latitude", r: "count", stroke: "red", fill: "red", fillOpacity: 0.2}), {
           // @ts-ignore
@@ -58,6 +73,18 @@ export const LaunchSites = () => {
             const r: number = +d3.select(event.target).attr("r");
             d3.select(event.target).attr("r", r*2)
             d3.select(event.target).attr('fill-opacity', 0.6);
+
+            const plotElement = document.querySelector(".plot");
+
+
+
+            if(plotElement != null){
+              var elDistanceToTop = window.pageYOffset + plotElement.getBoundingClientRect().top
+              var elDistanceToLeft = plotElement.getBoundingClientRect().left - window.pageXOffset + plotElement.getBoundingClientRect().width/2 
+              setPopX(event.clientX - elDistanceToLeft);
+              setPopY(event.clientY - elDistanceToTop);
+            }
+            setPopoverVisible(true);
           },
           // @ts-ignore
           pointerleave: function (event) {
@@ -65,6 +92,7 @@ export const LaunchSites = () => {
             const r: number = +d3.select(event.target).attr("r");
             d3.select(event.target).attr("r", r/2)
             d3.select(event.target).attr('fill-opacity', 0.2);
+            setPopoverVisible(false);
           }
         }
         ),
@@ -116,7 +144,6 @@ export const LaunchSites = () => {
         </div>
       </Row>  
       <Row>
-      <Col span={18}>
         <div className="plot">     
           <Slider
                   min={-180}
@@ -124,17 +151,12 @@ export const LaunchSites = () => {
                   onChange={onSliderChange}
                   value={typeof longitude === 'number' ? longitude : 0}
           />  
-          <Content ref={ref}> </Content>
+          <div >
+            <Popover content={satelliteInfo} open={popoverVisible} align={{offset:[popX, popY]}}>
+              <Content className="plotInner" ref={ref}> </Content>
+            </Popover>
+          </div>  
         </div>  
-      </Col>
-      <Col span={6}>
-        <div className="info"> 
-            <Title level={5} >{satHeader}</Title>
-            <Paragraph>Latitude: {latInfo}</Paragraph>
-            <Paragraph>Longitude: {longInfo}</Paragraph>
-            <Paragraph>Number of Satellites Launched: {countInfo}</Paragraph>
-        </div>
-        </Col>
       </Row>  
     </div>  
   );
