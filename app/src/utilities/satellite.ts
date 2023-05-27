@@ -237,12 +237,20 @@ class Satellite {
 
       const truncated_sat_data: any[] = [];
       for (let i = 0; i < sats_data.length; i++) {
+        // Add a flag indicating if the satellite is in active use currently
+        const launch_date = moment(sats_data[i]["Date of Launch"], "MM/DD/YYYY");
+        const expected_life = parseInt(sats_data[i]["Expected Lifetime (Years)"]);
+        const end_date = moment(launch_date).add(expected_life, 'year');
+        const current_date = moment(new Date());
+        sats_data[i]['in_active'] = end_date.diff(current_date) > 0;
+
         truncated_sat_data.push(sats_data[i]);
       }
 
       this.satelliteData = truncated_sat_data;
 
       this.updateLocation();
+      this.filter({'in_active' : [true]});
     };
 
     dataFetch();

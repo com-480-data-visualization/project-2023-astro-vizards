@@ -1,4 +1,4 @@
-import { theme, Input, Tree } from "antd";
+import { theme, Input, Tree, Checkbox, Card } from "antd";
 import Sider from "antd/es/layout/Sider";
 
 import React, { useMemo } from "react";
@@ -64,6 +64,17 @@ export function SatelliteList({
     // }
   };
 
+  const onChangeCheckbox = (e : any) => {
+    const filter_new = filters;
+    if (e.target.checked) {
+      filter_new['in_active'] = [true];
+    } else {
+      delete filter_new['in_active'];
+    }
+    setFilters(filter_new);
+    satelliteManager.filter(filter_new);
+  }
+
   const treeData = useMemo(() => {
     const sats_list = [];
     for (let i = 0; i < satellites.length; i++) {
@@ -117,6 +128,10 @@ export function SatelliteList({
       >
         {satellites.length} satellites
       </div>
+
+      <Card title="Extra options" style={{marginTop: '1rem'}}>
+        <Checkbox defaultChecked={true} onChange={onChangeCheckbox}/> Only active satellites
+      </Card>
     </Sider>
   );
 }

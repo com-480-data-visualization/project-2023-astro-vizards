@@ -52,7 +52,7 @@ function Home() {
     return satMan;
   }, [mapManager]);
 
-  const [filters, setFilters] = useState<FilterType>({});
+  const [filters, setFilters] = useState<FilterType>({'in_active' : [true]});
 
   useEffect(() => {
     mapManager.clearAllPoints();
