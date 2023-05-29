@@ -23,6 +23,7 @@ export const LaunchSites = () => {
   const [popoverVisible, setPopoverVisible] = useState(false);
   const [popX, setPopX] = useState(0);
   const [popY, setPopY] = useState(0);
+  const popHeight = window.innerHeight/10;
 
 
 
@@ -68,54 +69,52 @@ export const LaunchSites = () => {
         Plot.sphere(),
         on(Plot.dot(sites, {x: "longitude", y: "latitude", r: "count", stroke: "red", fill: "red", fillOpacity: 0.2}), {
           // @ts-ignore
-          pointerenter: function (event) {
+          mouseenter: function (event) {
             d3.select(event.target).style("cursor", "pointer");
             const r: number = +d3.select(event.target).attr("r");
             d3.select(event.target).attr("r", r*2)
             d3.select(event.target).attr('fill-opacity', 0.6);
 
+            
+            const p = d3.pointer(event, this);
             const plotElement = document.querySelector(".plot");
-
-
-
+            
             if(plotElement != null){
-              var elDistanceToTop = window.pageYOffset + plotElement.getBoundingClientRect().top
-              var elDistanceToLeft = plotElement.getBoundingClientRect().left - window.pageXOffset + plotElement.getBoundingClientRect().width/2 
-              setPopX(event.clientX - elDistanceToLeft);
-              setPopY(event.clientY - elDistanceToTop);
+              setPopX(event.clientX - plotElement.getBoundingClientRect().left - plotElement.getBoundingClientRect().width/2);//  - plotElement.getBoundingClientRect().width/2);
+              setPopY(event.clientY - 2*popHeight - 20);// - (-plotElement.getBoundingClientRect().top + plotElement.getBoundingClientRect().height/2) - r - 50);
             }
             setPopoverVisible(true);
+            //console.log("Mouse enter triggered");
           },
           // @ts-ignore
-          pointerleave: function (event) {
+          mouseout: function (event) {
             d3.select(event.target).style("cursor", "default");
             const r: number = +d3.select(event.target).attr("r");
             d3.select(event.target).attr("r", r/2)
             d3.select(event.target).attr('fill-opacity', 0.2);
             setPopoverVisible(false);
+            //console.log("Mouse leave triggered");
           }
         }
-        ),
+        )
       ]
     })
 
     // @ts-ignore
     function on(mark, listeners = {}){
-      const render = mark.render;
+      const render = mark.render ;
       mark.render = function () {    
         const g = render.apply(this, arguments);
         const r = d3.select(g).selectChildren();
         const sites = this.data;
         for (const [type, callback] of Object.entries(listeners)) {
-          r.on(type, function (event, i) {
+          r.on(type, function (event, k) {
+            //to eliminate type errors
+            const i: number = k as number;
             const p = d3.pointer(event, g);
-            // @ts-ignore
             setSatHeader(sites[i].name);
-            // @ts-ignore
             setLatInfo(sites[i].latitude);
-            // @ts-ignore
             setCountInfo(sites[i].count);
-            // @ts-ignore
             setLongInfo(sites[i].longitude);
             // @ts-ignore
             callback(event);
@@ -133,6 +132,14 @@ export const LaunchSites = () => {
 
   return (
     <div>
+      <Popover 
+        content={satelliteInfo} 
+        open={popoverVisible} 
+        align={{offset: [popX, popY]}} 
+        overlayStyle={{
+          height: popHeight
+        }}
+      >
       <Row>
         <div className="description">
           <Title level={3} >Launch Sites of the Satellites</Title>
@@ -152,12 +159,11 @@ export const LaunchSites = () => {
                   value={typeof longitude === 'number' ? longitude : 0}
           />  
           <div >
-            <Popover content={satelliteInfo} open={popoverVisible} align={{offset:[popX, popY]}}>
               <Content className="plotInner" ref={ref}> </Content>
-            </Popover>
           </div>  
         </div>  
       </Row>  
+      </Popover>
     </div>  
   );
 }
