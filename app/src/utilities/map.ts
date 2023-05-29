@@ -90,10 +90,11 @@ class MapManager {
     this.view = new MapView({
       container: undefined,
       map: map,
+      zoom: 2,
     });
     this.threeDView = new SceneView({
       container: undefined,
-      viewingMode: "global",
+      viewingMode: "global",  
       map: new Map({
         basemap: "hybrid",
       }),
@@ -105,7 +106,14 @@ class MapManager {
     this.threeDView.on("click", returnClickHandler(onClick, tempThis, true));
   }
   attachToContainer = (ref: React.RefObject<HTMLDivElement>) => {
+    if (ref.current === null) return;
+    const val = 150133097626 / ref.current.clientWidth;
     this.view.set("container", ref.current);
+    // When map is ready
+    this.view.when(() => {
+      this.view.scale = val;
+    }
+    );
   };
 
   attach3DToContainer = (ref: React.RefObject<HTMLDivElement>) => {
@@ -213,7 +221,7 @@ class MapManager {
       );
       this.view.goTo({
         target: this.current_points[satellites[0].id].graphic[0],
-        zoom: 4,
+        zoom: 5,
         heading: 0,
         tilt: 60,
       });
@@ -228,7 +236,7 @@ class MapManager {
       this.view.goTo({
         // Center the view on world center
         target: [0, 0],
-        zoom: 2,
+        zoom: 3,
         heading: 0,
         tilt: 0,
       })
