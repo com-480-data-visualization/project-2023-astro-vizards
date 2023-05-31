@@ -40,7 +40,7 @@ export const AboutUs = () => {
             <div className="member">
               <Avatar size={120} src="./pic1.jpg" />
               <div className="member-info">
-                <Title level={4}>Miguel Crespo Castaño</Title>
+                <Title level={4}>Miguel Crespo</Title>
                 <Paragraph>...</Paragraph>
               </div>
             </div>

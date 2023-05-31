@@ -14,6 +14,8 @@ import { FilterType, SatelliteMetadata, SatelliteType } from "./types";
 import { FilterList } from "./components/Sidebar/filterList";
 import { ThreeDView } from "./routes/ThreeDView/ThreeDView";
 
+import dayjs from 'dayjs';
+
 function Home() {
   useEffect(() => {
     Config.apiKey =
@@ -25,6 +27,7 @@ function Home() {
   const [metadata, setMetadata] = useState<SatelliteMetadata>(
     Satellite.getEmptyMetadata()
   );
+  const [currentDate, setCurrentDate] = useState<dayjs.Dayjs>(dayjs());
 
   const mapManager = useMemo(
     () =>
@@ -38,6 +41,8 @@ function Home() {
           heading: 0,
           tilt: 60,
         })
+
+        _this.clearOrbits();
         _this.drawOrbit(
           _this.getCurrentPoints()[satId].satellite,
           satelliteManager
@@ -46,9 +51,10 @@ function Home() {
     []
   );
   const satelliteManager = useMemo(() => {
-    const satMan = new Satellite(setSatellites, setMetadata, (satellites) =>
-      mapManager.drawInitialPoints(satellites)
-    );
+    const satMan = new Satellite(setSatellites, setMetadata, (satellites) => {
+      mapManager.removeAllPoints();
+      mapManager.drawInitialPoints(satellites);
+    });
     return satMan;
   }, [mapManager]);
 
@@ -58,6 +64,12 @@ function Home() {
     mapManager.clearAllPoints();
     mapManager.showPoints(satellites, satelliteManager);
   }, [satellites]);
+
+  useEffect(() => {
+    const points = mapManager.getCurrentPoints();
+    satelliteManager.updatePositionSatellite(points, currentDate.toDate());
+    console.dir('Updating points');
+  } ,[currentDate]);
 
   const onCloseDrawer = (e: any) => {
     setFocusedSatellite(-1);
@@ -69,7 +81,7 @@ function Home() {
 
   return (
     <Layout className="app">
-      <Header />
+      <Header currentDate={currentDate} setCurrentDate={setCurrentDate}/>
       <Layout>
         <FilterList
           metadata={metadata}
@@ -96,7 +108,7 @@ function Home() {
           setFocusedSatellite={setFocusedSatellite}
         />
       </Layout>
-      <Drawer open={focusedSatellite >= 0} onClose={onCloseDrawer}>
+      <Drawer open={focusedSatellite >= 0} onClose={onCloseDrawer} mask={false}>
         <InfoSatellite data={satelliteManager.getInfo(focusedSatellite)} />
       </Drawer>
     </Layout>

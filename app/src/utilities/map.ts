@@ -120,6 +120,12 @@ class MapManager {
     this.threeDView.set("container", ref.current);
   };
 
+  removeAllPoints = () => {
+    this.current_points = [];
+    this.graphicsLayers[0].removeAll();
+    this.graphicsLayers[1].removeAll();
+  }
+
   clearAllPoints = () => {
     this.view.graphics.removeAll();
     this.threeDView.graphics.removeAll();
@@ -129,6 +135,20 @@ class MapManager {
       }
     }
   };
+
+  clearOrbits = () => {
+    for (const layer of [this.view, this.threeDView]) {
+      for (let i = layer.graphics.length-1; i >= 0 ; i--) {
+        const item = layer.graphics.getItemAt(i);
+        console.dir(item);
+        if (item.geometry.type === "polyline") {
+          layer.graphics.removeAt(i);
+        } else {
+          break
+        }
+      }
+    }
+  }
 
   drawInitialPoints = (satellites: SatelliteType[]) => {
     for (let i = 0; i < satellites.length; i++) {

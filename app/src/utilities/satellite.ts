@@ -10,6 +10,7 @@ import {
 } from "satellite.js";
 import "moment";
 import moment from "moment";
+import Point from "@arcgis/core/geometry/Point";
 
 class Satellite {
   private setSatellites: React.Dispatch<React.SetStateAction<SatelliteType[]>>;
@@ -218,8 +219,10 @@ class Satellite {
 
     this.allSattelites = sats;
     this.setMetadata(this.metadata);
-    this.setSatellites(sats);
-    this.callBack(sats);
+    // this.setSatellites(sats);
+    const filtered_sats = this.getSatellites();
+    this.setSatellites(filtered_sats);
+    this.callBack(filtered_sats);
   };
 
   private initSatellites = () => {
@@ -265,6 +268,33 @@ class Satellite {
       "Operator/Owner": [],
     };
   }
+
+  public updatePositionSatellite(current_points:any, current_date:Date) {
+    const sats_data = this.satelliteData;
+    var gmst = gstime(current_date);
+    for (let i = 0; i < current_points.length; i++) {
+      try {
+        const satrec = twoline2satrec(
+          sats_data[i]["LINE1"],
+          sats_data[i]["LINE2"]
+        );
+        const positionAndVelocity = propagate(satrec, current_date);
+        const positionEci = positionAndVelocity.position;
+
+        const positionGd = eciToGeodetic(positionEci as EciVec3<number>, gmst);
+        const longitudeDeg = degreesLong(positionGd.longitude);
+        const latitudeDeg = degreesLat(positionGd.latitude);
+
+        const graphics = current_points[i].graphic;
+        const p = new Point({
+          longitude: longitudeDeg,
+          latitude: latitudeDeg,
+        });
+        graphics[0].geometry = p;
+        graphics[1].geometry = p;
+      } catch (e) {}
+    }
+  };
 }
 
 export { Satellite };
