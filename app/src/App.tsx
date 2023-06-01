@@ -15,6 +15,7 @@ import { FilterList } from "./components/Sidebar/filterList";
 import { ThreeDView } from "./routes/ThreeDView/ThreeDView";
 
 import dayjs from 'dayjs';
+import { Content } from "antd/es/layout/layout";
 
 function Home() {
   useEffect(() => {
@@ -101,14 +102,14 @@ function Home() {
           setFilters={setFilters}
           ref={leftSideBarRef}
         />
-        <Layout className="app__content">
+        <Content className="app__content">
           <Routes>
             <Route path="/" element={<MapPage mapManager={mapManager} />} />
             <Route path="/about-us" element={<AboutUs />} />
             <Route path="/three-d-view" element={<ThreeDView mapManager={mapManager}/>} />
             <Route path="/launch-sites" element={<LaunchSites />} />
           </Routes>
-        </Layout>
+        </Content>
         <SatelliteList
           satellites={satellites}
           satelliteManager={satelliteManager}

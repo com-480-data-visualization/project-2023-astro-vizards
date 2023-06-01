@@ -46,7 +46,7 @@ function TimeBarFunction({currentDate, setCurrentDate} : any, ref: RefObject<HTM
         }
     }
 
-    return <div>
+    return <div style={{display: 'flex', justifyContent: "flex-end", alignItems: "center", height: "100%", flexWrap: "nowrap"}}>
         <DatePicker format="DD-MM-YYYY HH:mm:ss" 
                     showTime={true} 
                     defaultValue={dayjs()} 

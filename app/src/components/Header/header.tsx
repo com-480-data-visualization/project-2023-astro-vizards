@@ -1,4 +1,4 @@
-import { Menu, MenuProps, Button, Space } from "antd";
+import { Menu, MenuProps, Button, Space, Row, Col } from "antd";
 import { Header as AntHeader } from "antd/es/layout/layout";
 import { useNavigate } from "react-router-dom";
 import { BookOutlined, RocketOutlined, EnvironmentOutlined, QuestionOutlined } from "@ant-design/icons";
@@ -80,22 +80,26 @@ const Header = forwardRef<HeaderRefs, HeaderProps>(({currentDate, setCurrentDate
 
   return (
     <AntHeader className="header">
-      <div className="logo" />
-      <div style={{float: 'right'}}>
-        <Space>
-          <TimeBar currentDate={currentDate} setCurrentDate={setCurrentDate} ref={realTime}/>
-          <Button icon={<QuestionOutlined/>} ref={restartTour} onClick={() => setTourOpen(true)}/>
-        </Space>
-      </div>
-
-      <div style={{width: '50rem'}}>
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          items={items}
-          onClick={(e) => handleMenuClick(e)}
-        />
-      </div>
+      <Row justify={"space-between"} wrap={false}>
+        <Col lg={16} md={15} sm={12} xs={4}>
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            items={items}
+            onClick={(e) => handleMenuClick(e)}
+          />
+      </Col>
+      <Col lg={8} md={9} sm={12} xs={20}>
+        <Row justify={"end"}>
+          <Col span={23}>
+            <TimeBar currentDate={currentDate} setCurrentDate={setCurrentDate} ref={realTime}/>
+          </Col>
+          <Col span={1}>
+            <Button icon={<QuestionOutlined/>} ref={restartTour} onClick={() => setTourOpen(true)}/>
+          </Col>
+        </Row>
+      </Col>
+      </Row>
     </AntHeader>
   );
 });
