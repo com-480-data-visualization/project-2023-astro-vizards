@@ -79,7 +79,6 @@ function Home() {
     satelliteManager.filter(filter_new);
   };
 
-  const [tourOpen, setTourOpen] = useState<boolean>(true);
 
   const [
     leftSideBarRef,
@@ -88,6 +87,8 @@ function Home() {
     restartTourRef,
     realTimeRef,
   ] = [useRef(null), useRef<SatelliteListRefs>(null), useRef<HeaderRefs>(null), useRef(null), useRef(null)];
+
+  const [tourOpen, setTourOpen] = useState<boolean>(false);
 
   return (
     <Layout className="app">

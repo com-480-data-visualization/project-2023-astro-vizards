@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Tour as AntTour } from 'antd';
 import type { TourProps as AntTourProps } from 'antd';
+import Cookies from 'universal-cookie';
 
 interface TourProps extends AntTourProps {
     open: boolean;
@@ -29,7 +30,7 @@ const Tour = ({
     const steps: TourProps['steps'] = [
         {
           title: 'Welcome the AstroVIZards Tour!',
-          description: 'We will be giving you, a quick tour on how to use this website!',
+          description: 'We will be giving you, a quick tour on how to use this website! Note that, this tour is automatically shown ONLY the first time you visit this website. After you COMPLETE the tour, it will no longer be automatically shown.',
         },
         {
           title: 'Filtering Satellites I',
@@ -69,10 +70,17 @@ const Tour = ({
             target: () => restartTourButton.current,
         },
       ];
-    
+    const cookies = new Cookies();
+    const tour = cookies.get('tour');
+    if (tour === undefined) {
+        setOpen(true);
+    }
 
     return (
-        <AntTour open={open} onClose={() => setOpen(false)} steps={steps} {...rest}/>
+        <AntTour open={open} onClose={() => {
+            setOpen(false);
+            cookies.set('tour', 'done', { path: '/' });
+        }} steps={steps} {...rest}/>
     );
 }
 
