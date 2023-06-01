@@ -1,12 +1,12 @@
 import { DatePicker, TimePicker, Button } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { RefObject, forwardRef, useEffect, useMemo, useState } from "react";
 
 // import moment from "moment";
 import dayjs from 'dayjs';
 
 const INTERVAL_SECONDS = 1;
 
-export function TimeBar({currentDate, setCurrentDate} : any) {
+function TimeBarFunction({currentDate, setCurrentDate} : any, ref: RefObject<HTMLButtonElement>) {
     const [realtime, setRealtime] = useState<boolean>(false);
     // const [idInterval, setIdInterval] = useState<NodeJS.Timer>();
 
@@ -56,7 +56,10 @@ export function TimeBar({currentDate, setCurrentDate} : any) {
         />
         <Button style={{marginLeft : '0.5rem'}} 
                 onClick={clickButton}
+                ref={ref}
                 type={(!realtime) ? 'default' : 'primary'}
         > {(!realtime) ? 'Realtime' : 'Realtime ON'} </Button>
     </div>
 }
+
+export const TimeBar = forwardRef<HTMLButtonElement, any>((props, ref) => TimeBarFunction(props, ref as RefObject<HTMLButtonElement>));

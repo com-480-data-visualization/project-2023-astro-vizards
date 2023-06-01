@@ -1,7 +1,7 @@
 import { Menu, MenuItemProps, theme } from "antd";
 import Sider from "antd/es/layout/Sider";
 import { CloseCircleOutlined } from "@ant-design/icons";
-import React, { useEffect } from "react";
+import React, { Ref, RefObject, forwardRef, useEffect } from "react";
 import { FilterType, SatelliteMetadata } from "../../types";
 import { Satellite } from "../../utilities";
 import Search from "antd/es/input/Search";
@@ -17,12 +17,12 @@ interface SidebarProps {
   setFilters: React.Dispatch<React.SetStateAction<FilterType>>;
 }
 
-export function FilterList({
+function FilterListFunction({
   metadata,
   satelliteManager,
   filters,
   setFilters,
-}: SidebarProps) {
+}: SidebarProps, ref: RefObject<HTMLDivElement>) {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -90,6 +90,7 @@ export function FilterList({
     <Sider
       className="filterList"
       width={200}
+      ref={ref}
       collapsed={collapsed}
       style={{
         background: colorBgContainer,
@@ -132,3 +133,5 @@ export function FilterList({
     </Sider>
   );
 }
+
+export const FilterList = forwardRef<RefObject<HTMLInputElement>, SidebarProps>((props, ref) => FilterListFunction(props, ref as RefObject<HTMLInputElement>))

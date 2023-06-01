@@ -1,7 +1,7 @@
 import { theme, Input, Tree, Checkbox, Card } from "antd";
 import Sider from "antd/es/layout/Sider";
 
-import React, { useMemo } from "react";
+import React, { ForwardedRef, RefObject, useImperativeHandle, useMemo } from "react";
 import { SatelliteType, FilterType } from "../../types";
 import { Satellite } from "../../utilities";
 
@@ -16,7 +16,12 @@ interface SidebarProps {
   focusedSatellite: number;
 }
 
-export function SatelliteList({
+export type SatelliteListRefs = {
+  rightSideBar: RefObject<HTMLInputElement>;
+  activeSats: RefObject<HTMLInputElement>;
+}
+
+function SatelliteListFunction({
   satellites,
   satelliteManager,
   filters,
@@ -24,7 +29,7 @@ export function SatelliteList({
   setFocusedSatellite,
   setSearchValue,
   searchValue,
-}: SidebarProps) {
+}: SidebarProps, ref: ForwardedRef<SatelliteListRefs>) {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -96,9 +101,17 @@ export function SatelliteList({
   }, [searchValue, satellites]);
 
   const { Search } = Input;
+  const rightSideBar = React.useRef<HTMLInputElement>(null);
+  const activeSats = React.useRef<HTMLInputElement>(null);
+  useImperativeHandle(ref, () => ({
+    rightSideBar: rightSideBar,
+    activeSats: activeSats,
+  }));
+
   return (
     <Sider
       width={200}
+      ref={rightSideBar}
       style={{
         background: colorBgContainer,
         maxHeight: "100vh",
@@ -129,9 +142,11 @@ export function SatelliteList({
         {satellites.length} satellites
       </div>
 
-      <Card title="Extra options" style={{marginTop: '1rem'}}>
+      <Card title="Extra options" style={{marginTop: '1rem'}} ref={activeSats}>
         <Checkbox defaultChecked={true} onChange={onChangeCheckbox}/> Only active satellites
       </Card>
     </Sider>
   );
 }
+
+export const SatelliteList = React.forwardRef<SatelliteListRefs, SidebarProps>((props, ref) => SatelliteListFunction(props, ref));

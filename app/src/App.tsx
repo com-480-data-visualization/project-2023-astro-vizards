@@ -1,10 +1,10 @@
 import "./app.scss";
-import { useEffect, useMemo, useState } from "react";
+import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 import { Drawer, Layout } from "antd";
 import { Route, Routes } from "react-router-dom";
 
 import Config from "@arcgis/core/config";
-import { Header, SatelliteList, InfoSatellite } from "./components";
+import { Header, SatelliteList, InfoSatellite, Tour, SatelliteListRefs, HeaderRefs } from "./components";
 import { MapPage } from "./routes";
 import { AboutUs } from "./routes/AboutUs/AboutUs";
 import { LaunchSites } from "./routes/plots/LaunchSites/LaunchSites";
@@ -79,15 +79,26 @@ function Home() {
     satelliteManager.filter(filter_new);
   };
 
+  const [tourOpen, setTourOpen] = useState<boolean>(true);
+
+  const [
+    leftSideBarRef,
+    rightSideBarRef,
+    headerRef,
+    restartTourRef,
+    realTimeRef,
+  ] = [useRef(null), useRef<SatelliteListRefs>(null), useRef<HeaderRefs>(null), useRef(null), useRef(null)];
+
   return (
     <Layout className="app">
-      <Header currentDate={currentDate} setCurrentDate={setCurrentDate}/>
+      <Header currentDate={currentDate} setCurrentDate={setCurrentDate} ref={headerRef} setTourOpen={setTourOpen}/>
       <Layout>
         <FilterList
           metadata={metadata}
           satelliteManager={satelliteManager}
           filters={filters}
           setFilters={setFilters}
+          ref={leftSideBarRef}
         />
         <Layout className="app__content">
           <Routes>
@@ -101,6 +112,7 @@ function Home() {
           satellites={satellites}
           satelliteManager={satelliteManager}
           filters={filters}
+          ref={rightSideBarRef}
           setFilters={setFilters}
           searchValue={searchValue}
           setSearchValue={setSearchValue}
@@ -111,6 +123,20 @@ function Home() {
       <Drawer open={focusedSatellite >= 0} onClose={onCloseDrawer} mask={false}>
         <InfoSatellite data={satelliteManager.getInfo(focusedSatellite)} />
       </Drawer>
+      {rightSideBarRef.current && headerRef.current && (
+        <Tour
+          open={tourOpen}
+          setOpen={setTourOpen}
+          restartTourButton={headerRef.current.restartTour as MutableRefObject<null>}
+          leftSideBar={leftSideBarRef}
+          rightSideBar={rightSideBarRef.current.rightSideBar as MutableRefObject<null>}
+          twodView={headerRef.current.twodViewRef as MutableRefObject<null>}
+          threedView={headerRef.current.threedViewRef as MutableRefObject<null>}
+          realTime={headerRef.current.realTime as MutableRefObject<null>}
+          activeSats={rightSideBarRef.current.activeSats as MutableRefObject<null>}
+        />
+      )
+      }
     </Layout>
   );
 }
