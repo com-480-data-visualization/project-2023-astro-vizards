@@ -127,7 +127,7 @@ function SatelliteListFunction({
         treeData={treeData}
         height={400}
         showIcon={true}
-        checkable={true}
+        checkable={false}
         onSelect={onSelect}
         onCheck={onCheck}
       />
