@@ -42,7 +42,7 @@ export function InfoSatellite({ data }: SidebarProps) {
             <Slider marks={marks} disabled={true} defaultValue={percentage_life} />
         </Card>
 
-        <Card title="Launch information" extra={<a href="#">Go to place</a>} bordered={true} style={{marginTop: '1rem'}}>
+        <Card title="Launch information" /*extra={<a href="#">Go to place</a>}*/ bordered={true} style={{marginTop: '1rem'}}>
             <Descriptions column={1} style={{marginTop: '1rem'}}>
                 <Descriptions.Item label="Launch site">{data["Launch Site"]}</Descriptions.Item>
                 <Descriptions.Item label="Launch vehicle">{data["Launch Vehicle"]}</Descriptions.Item>
