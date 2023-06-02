@@ -3,7 +3,7 @@ import Sider from "antd/es/layout/Sider";
 
 import React, { ForwardedRef, RefObject, useImperativeHandle, useMemo } from "react";
 import { SatelliteType, FilterType } from "../../types";
-import { Satellite } from "../../utilities";
+import { MapManager, Satellite } from "../../utilities";
 
 interface SidebarProps {
   satellites: SatelliteType[];
@@ -14,6 +14,7 @@ interface SidebarProps {
   setFocusedSatellite: React.Dispatch<React.SetStateAction<number>>;
   searchValue: string;
   focusedSatellite: number;
+  mapManager: MapManager;
 }
 
 export type SatelliteListRefs = {
@@ -24,6 +25,7 @@ export type SatelliteListRefs = {
 function SatelliteListFunction({
   satellites,
   satelliteManager,
+  mapManager,
   filters,
   setFilters,
   setFocusedSatellite,
@@ -40,18 +42,27 @@ function SatelliteListFunction({
   };
 
   const onSelect = (selected: any, info: any) => {
-    const filter_new = filters;
-    if (selected.length === 0) {
-      setFocusedSatellite(-1);
-      delete filter_new["id"];
-      setFilters(filter_new);
-      satelliteManager.filter(filter_new);
-      return;
-    }
-    setFocusedSatellite(selected[0]);
-    filter_new["id"] = [selected[0]];
-    setFilters(filter_new);
-    satelliteManager.filter(filter_new);
+    if(selected === undefined || selected.length === 0) return;
+    const satId = selected[0]
+    setFocusedSatellite(satId);
+    const selectedGraphic = mapManager.getCurrentPoints()[satId].graphic;
+    mapManager.getView().goTo({
+      target: selectedGraphic[0].geometry,
+      zoom: 4,
+      heading: 0,
+      tilt: 60,
+    })
+    mapManager.get3DView().goTo({
+      target: selectedGraphic[1].geometry,
+      zoom: 4,
+      heading: 0,
+      tilt: 60,
+    })
+    mapManager.clearOrbits();
+    mapManager.drawOrbit(
+      mapManager.getCurrentPoints()[satId].satellite,
+      satelliteManager
+    );
   };
 
   const onCheck = (checkedKeys: any, info: any) => {
@@ -128,8 +139,9 @@ function SatelliteListFunction({
         height={400}
         showIcon={true}
         checkable={false}
+        selectable={true}
+        selectedKeys={[]}
         onSelect={onSelect}
-        onCheck={onCheck}
       />
       <div
         style={{

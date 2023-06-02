@@ -180,13 +180,13 @@ class Satellite {
       const longitudeDeg = degreesLong(positionGd.longitude);
       const latitudeDeg = degreesLat(positionGd.latitude);
       if (isNaN(longitudeDeg) || isNaN(latitudeDeg)) {
-        console.log("undefined",{
-        id: i,
-        name: sats_data[i]["Official Name of Satellite"],
-        longitude: longitudeDeg,
-        latitude: latitudeDeg,
-        selected: true,
-        })
+        // console.log("undefined",{
+        // id: i,
+        // name: sats_data[i]["Official Name of Satellite"],
+        // longitude: longitudeDeg,
+        // latitude: latitudeDeg,
+        // selected: true,
+        // })
         continue;
       }
       sats.push({
@@ -213,7 +213,7 @@ class Satellite {
       addUnique("Contractor", sat["Contractor"]);
       }
       catch (e) {
-        console.log("Failed to process satellite", sats_data[i]["Official Name of Satellite"], e)
+        //console.log("Failed to process satellite", sats_data[i]["Official Name of Satellite"], e)
       }
     }
 

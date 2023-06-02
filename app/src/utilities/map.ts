@@ -52,7 +52,6 @@ const returnClickHandler = (
   // Search for graphics at the clicked location
   const view = threed ? tempThis.get3DView() : tempThis.getView();
   view.hitTest(screenPoint).then((response) => {
-    console.log("Hit test response: ", response)
     if (response.results.length < 1) return;
     const selectedGraphic = response.results[0];
     if (selectedGraphic !== undefined && !selectedGraphic.type) return;

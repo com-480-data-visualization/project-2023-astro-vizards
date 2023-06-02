@@ -34,6 +34,7 @@ function Home() {
     () =>
       new MapManager(setFocusedSatellite, (selectedGraphic, _this, threed) => {
         const satId = selectedGraphic.attributes.satellite_id;
+        if (satId === undefined) return;
         _this.setFocusedSat(satId);
         const view = threed ? _this.get3DView() : _this.getView();
         view.goTo({
@@ -79,8 +80,7 @@ function Home() {
     setFilters(filter_new);
     satelliteManager.filter(filter_new);
   };
-
-
+  
   const [
     leftSideBarRef,
     rightSideBarRef,
@@ -113,6 +113,7 @@ function Home() {
         <SatelliteList
           satellites={satellites}
           satelliteManager={satelliteManager}
+          mapManager={mapManager}
           filters={filters}
           ref={rightSideBarRef}
           setFilters={setFilters}
