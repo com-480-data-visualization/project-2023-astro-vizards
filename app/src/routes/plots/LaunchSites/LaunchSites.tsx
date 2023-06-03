@@ -21,9 +21,10 @@ export const LaunchSites = () => {
   const [longInfo, setLongInfo] = useState(" ");
   const [countInfo, setCountInfo] = useState(" ");
   const [popoverVisible, setPopoverVisible] = useState(false);
-  const [popX, setPopX] = useState(0);
-  const [popY, setPopY] = useState(0);
+  const [popCoordinates, setPopCoordinates] = useState([0,0]);
   const popHeight = window.innerHeight/10;
+  const popWidth = window.innerWidth/10;
+  const popoverRef = useRef(null);
 
 
 
@@ -70,30 +71,28 @@ export const LaunchSites = () => {
         on(Plot.dot(sites, {x: "longitude", y: "latitude", r: "count", stroke: "red", fill: "red", fillOpacity: 0.2}), {
           // @ts-ignore
           mouseenter: function (event) {
+            if (popoverVisible === true) return;
             d3.select(event.target).style("cursor", "pointer");
             const r: number = +d3.select(event.target).attr("r");
             d3.select(event.target).attr("r", r*2)
             d3.select(event.target).attr('fill-opacity', 0.6);
 
-            
-            const p = d3.pointer(event, this);
             const plotElement = document.querySelector(".plot");
-            
-            if(plotElement != null){
-              setPopX(event.clientX - plotElement.getBoundingClientRect().left - plotElement.getBoundingClientRect().width/2);//  - plotElement.getBoundingClientRect().width/2);
-              setPopY(event.clientY - 2*popHeight - 20);// - (-plotElement.getBoundingClientRect().top + plotElement.getBoundingClientRect().height/2) - r - 50);
+
+            if(plotElement != null && popoverRef != null && popoverRef.current != null){
+              const p = d3.pointer(event, ref.current);
+              setPopoverVisible(true);
+              setPopCoordinates([p[0], p[1]]);
             }
-            setPopoverVisible(true);
-            //console.log("Mouse enter triggered");
           },
           // @ts-ignore
           mouseout: function (event) {
+          
             d3.select(event.target).style("cursor", "default");
             const r: number = +d3.select(event.target).attr("r");
             d3.select(event.target).attr("r", r/2)
             d3.select(event.target).attr('fill-opacity', 0.2);
             setPopoverVisible(false);
-            //console.log("Mouse leave triggered");
           }
         }
         )
@@ -128,18 +127,11 @@ export const LaunchSites = () => {
     // @ts-ignore
     ref.current.append(earthPlot);
     return () => earthPlot.remove();
-  }, [land, sites, longitude]);
+  }, [land, sites, longitude, popoverVisible]);
 
   return (
     <div>
-      <Popover 
-        content={satelliteInfo} 
-        open={popoverVisible} 
-        align={{offset: [popX, popY]}} 
-        overlayStyle={{
-          height: popHeight
-        }}
-      >
+
       <Row>
         <div className="description">
           <Title level={3} >Launch Sites of the Satellites</Title>
@@ -159,11 +151,25 @@ export const LaunchSites = () => {
                   value={typeof longitude === 'number' ? longitude : 0}
           />  
           <div >
+            <Popover 
+              content={satelliteInfo} 
+              open={popoverVisible} 
+              align={{offset: popCoordinates}} 
+              overlayStyle={{
+                height: popHeight
+              }}
+              style={{
+                pointerEvents: "none"
+              }}
+              placement="topLeft"
+              ref={popoverRef}
+            >
               <Content className="plotInner" ref={ref}> </Content>
+            </Popover>
           </div>  
         </div>  
       </Row>  
-      </Popover>
+
     </div>  
   );
 }

@@ -1,12 +1,25 @@
 .plot{
-    width: 55%;
-    height: 55%;
-    margin-left: 20%;
+    width: 100%;
+    height: 100%;
     border-color: "#F5F5F5";
     background-color: "#F5F5F5";
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .ant-slider{
+        width: 50%;
+    }
 }
 
 .plotInner{
     border-color: "#F5F5F5";
     background-color: "#F5F5F5";
+}
+
+.ant-popover{
+    pointer-events: none !important;
+    & > * {
+        pointer-events: none !important;
+    }
 }
