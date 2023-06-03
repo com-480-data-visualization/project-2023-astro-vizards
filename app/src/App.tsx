@@ -102,7 +102,7 @@ function Home() {
           setFilters={setFilters}
           ref={leftSideBarRef}
         />
-        <Content className="app__content">
+        <Content className="app__content" style={{overflow: 'auto'}}>
           <Routes>
             <Route path="/" element={<MapPage mapManager={mapManager} />} />
             <Route path="/about-us" element={<AboutUs />} />

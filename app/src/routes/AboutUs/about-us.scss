@@ -1,23 +1,14 @@
+
 .members-container {
     display: flex;
     justify-content: center;
   }
   
-  .members {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-  }
-  
-  .member {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
   
   .member-info {
     margin-top: 1rem;
+    text-align: center;
+    overflow: auto;
   }
 
   .data {
