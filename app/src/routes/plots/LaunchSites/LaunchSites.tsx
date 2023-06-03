@@ -10,7 +10,6 @@ const { Title, Paragraph } = Typography;
 
 
 export const LaunchSites = () => {
-  //const ref = useRef(null);
   const ref = useRef(null);
   const [land, setLand] = useState();
   const [sites, setSites] = useState();
@@ -71,15 +70,13 @@ export const LaunchSites = () => {
         on(Plot.dot(sites, {x: "longitude", y: "latitude", r: "count", stroke: "red", fill: "red", fillOpacity: 0.2}), {
           // @ts-ignore
           mouseenter: function (event) {
-            if (popoverVisible === true) return;
-            d3.select(event.target).style("cursor", "pointer");
-            const r: number = +d3.select(event.target).attr("r");
-            d3.select(event.target).attr("r", r*2)
-            d3.select(event.target).attr('fill-opacity', 0.6);
-
             const plotElement = document.querySelector(".plot");
 
             if(plotElement != null && popoverRef != null && popoverRef.current != null){
+              d3.select(event.target).style("cursor", "pointer");
+              const r: number = +d3.select(event.target).attr("r");
+              d3.select(event.target).attr("r", r*2)
+              d3.select(event.target).attr('fill-opacity', 0.6);
               const p = d3.pointer(event, ref.current);
               setPopoverVisible(true);
               setPopCoordinates([p[0], p[1]]);
@@ -108,7 +105,6 @@ export const LaunchSites = () => {
         const sites = this.data;
         for (const [type, callback] of Object.entries(listeners)) {
           r.on(type, function (event, k) {
-            //to eliminate type errors
             const i: number = k as number;
             const p = d3.pointer(event, g);
             setSatHeader(sites[i].name);

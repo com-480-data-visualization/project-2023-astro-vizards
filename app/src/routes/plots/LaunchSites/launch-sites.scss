@@ -22,4 +22,7 @@
     & > * {
         pointer-events: none !important;
     }
+    &-arrow{
+        display: none !important;
+    }
 }
