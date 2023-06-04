@@ -28,7 +28,7 @@ function FilterListFunction({
   } = theme.useToken();
   const [entries, setEntries] = React.useState(Object.entries(metadata));
   const [searchVal, setSearchVal] = React.useState("");
-  const [collapsed, setCollapsed] = React.useState(true);
+  const [collapsed, setCollapsed] = React.useState(false);
   const [selectedKeys, setSelectedKeys] = React.useState<Array<string>>([]);
   useEffect(() => {
     const temp: [string, string[]][] = Object.entries(metadata).map((entry) => {
@@ -94,8 +94,6 @@ function FilterListFunction({
       collapsed={collapsed}
       style={{
         background: colorBgContainer,
-        maxHeight: "100vh",
-        overflow: "auto",
       }}
     >
       {collapsed ? (
@@ -126,7 +124,7 @@ function FilterListFunction({
         mode="inline"
         // defaultSelectedKeys={["1"]}
         // defaultOpenKeys={["sub1"]}
-        style={{ height: "100%", borderRight: 0 }}
+        style={{ borderRight: 0 }}
         items={items}
         selectedKeys={selectedKeys}
       />

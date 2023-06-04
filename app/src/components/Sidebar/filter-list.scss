@@ -1,6 +1,7 @@
 .filterList {
   position: relative;
   overflow: visible !important;
+  height: 100%;
 
   & > div {
     overflow: auto !important;

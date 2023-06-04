@@ -1,4 +1,4 @@
-import { theme, Input, Tree, Checkbox, Card } from "antd";
+import { theme, Input, Tree, Checkbox, Card, Divider } from "antd";
 import Sider from "antd/es/layout/Sider";
 
 import React, { ForwardedRef, RefObject, useImperativeHandle, useMemo } from "react";
@@ -143,17 +143,7 @@ function SatelliteListFunction({
         selectedKeys={[]}
         onSelect={onSelect}
       />
-      <div
-        style={{
-          textAlign: "center",
-          marginTop: "0.25rem",
-          paddingTop: "0.5rem",
-          borderTop: "1px solid black",
-        }}
-      >
-        {satellites.length} satellites
-      </div>
-
+      <Divider plain>{satellites.length} satellites</Divider>
       <Card title="Extra options" style={{marginTop: '1rem'}} ref={activeSats}>
         <Checkbox defaultChecked={true} onChange={onChangeCheckbox}/> Only active satellites
       </Card>
