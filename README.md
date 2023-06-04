@@ -11,6 +11,7 @@
 **Website can be found [here](https://com-480-data-visualization.github.io/project-2023-astro-vizards/)**
 
 If you want to run the project locally, please follow the instructions in the readme of `./app` folder.
+
 ## Milestone 1 (23rd April, 5pm)
 
 **10% of the final grade**
@@ -24,8 +25,11 @@ If you want to run the project locally, please follow the instructions in the re
 > Report can be found [here](reports/milestone2/report.pdf)
 
 
-
 ## Milestone 3 (4th June, 5pm)
 
 **80% of the final grade**
+
+> Process book can be found [here](reports/milestone3/process_book.pdf)
+
+> Screencast can be found in [Youtube](https://youtu.be/vTWwZj47CH8)
 
