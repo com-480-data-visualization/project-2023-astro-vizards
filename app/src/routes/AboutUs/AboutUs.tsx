@@ -7,10 +7,10 @@ const { Title, Paragraph } = Typography;
 export const AboutUs = () => {
 
   return (
-    <div className="about-us">
-      <div className="about">
+    <Space direction="vertical" size={"large"}>
+      <Space direction="vertical" size={"small"}>
         <Title level={2}>About Us</Title>
-        <Divider />
+        <Divider/>
         <Paragraph>
           This website has been designed by three EPFL students as part of the Data Visualization (COM-480) Course. 
           As the number of satellites orbiting the Earth continues to increase, tracking their movements and positions 
@@ -19,9 +19,9 @@ export const AboutUs = () => {
           real-time data from various sources. We allow users to see the satellites orbiting the Earth on 2D and 3D maps, 
           and also view the altitude, speed and other relevant information for the satellite of their choice.
         </Paragraph>
-      </div>
+      </Space>
 
-      <div className="data">
+      <Space direction="vertical" size={"small"}>
         <Title level={2}>About the Data</Title>
         <Divider />
         <Paragraph>Our dataset contains information about the satellites currently in the Earth's orbit. We obtain this dataset by joining two sources of data:
@@ -36,7 +36,7 @@ export const AboutUs = () => {
           </li>
         </ul>
         </Paragraph>   
-      </div>
+      </Space>
 
       <div className="team">
         <Title level={2}>About the Team</Title>
@@ -71,7 +71,7 @@ export const AboutUs = () => {
             </Col>
         </Row>
       </div>
-    </div>
+    </Space>
   );
 };
 
